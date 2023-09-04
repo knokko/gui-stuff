@@ -1,0 +1,150 @@
+import org.gradle.internal.os.OperatingSystem
+
+plugins {
+    id 'java'
+    id 'org.jetbrains.kotlin.jvm' version '1.9.0'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'org.jetbrains.kotlin.jvm'
+    apply plugin: 'com.github.johnrengelman.shadow'
+
+    repositories {
+        mavenCentral()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url 'https://jitpack.io' }
+    }
+
+    compileKotlin {
+        kotlinOptions.jvmTarget = "20"
+    }
+
+    compileTestKotlin {
+        kotlinOptions.jvmTarget = "20"
+    }
+
+    java {
+        sourceCompatibility = "20"
+        targetCompatibility = "20"
+    }
+
+    project.ext.jomlVersion = "1.10.1"
+    project.ext.lwjglVersion = "3.3.2"
+    project.ext.coroutinesVersion = "1.7.3"
+    switch (OperatingSystem.current()) {
+        case OperatingSystem.LINUX:
+            def osArch = System.getProperty("os.arch")
+            project.ext.lwjglNatives = osArch.startsWith("arm") || osArch.startsWith("aarch64")
+                    ? "natives-linux-${osArch.contains("64") || osArch.startsWith("armv8") ? "arm64" : "arm32"}"
+                    : "natives-linux"
+            break
+        case OperatingSystem.WINDOWS:
+            def osArch = System.getProperty("os.arch")
+            project.ext.lwjglNatives = osArch.contains("64")
+                    ? "natives-windows${osArch.startsWith("aarch64") ? "-arm64" : ""}"
+                    : "natives-windows-x86"
+            break
+    }
+
+    dependencies {
+        testImplementation platform('org.junit:junit-bom:5.10.0')
+        testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+        testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+        compileOnly platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
+        compileOnly "org.lwjgl:lwjgl"
+        compileOnly "org.lwjgl:lwjgl-vulkan"
+        compileOnly "org.lwjgl:lwjgl-vma"
+        compileOnly "org.joml:joml:${jomlVersion}"
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+}
+
+project(':graviks2d') {
+    dependencies {
+        compileOnly 'com.github.knokko:vk-boiler:v1.0.0'
+        implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
+        implementation "org.lwjgl:lwjgl-stb"
+        compileOnly "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
+
+        compileOnly "org.lwjgl:lwjgl"
+        compileOnly "org.lwjgl:lwjgl-vma"
+        compileOnly "org.lwjgl:lwjgl-vulkan"
+
+        testImplementation "org.lwjgl:lwjgl-glfw"
+        testImplementation "org.lwjgl:lwjgl-vma"
+        testImplementation "org.lwjgl:lwjgl-vulkan"
+
+        runtimeOnly "org.lwjgl:lwjgl::$lwjglNatives"
+        runtimeOnly "org.lwjgl:lwjgl-stb::$lwjglNatives"
+
+        testImplementation project(':graviks-glfw')
+        testImplementation 'com.github.knokko:vk-boiler:v1.0.0'
+        testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
+    }
+}
+
+project(':graviks-glfw') {
+    dependencies {
+        implementation project(':graviks2d')
+        implementation 'com.github.knokko:vk-boiler:v1.0.0'
+        implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
+
+        implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
+
+        implementation "org.lwjgl:lwjgl"
+        implementation "org.lwjgl:lwjgl-glfw"
+        implementation "org.lwjgl:lwjgl-stb"
+        implementation "org.lwjgl:lwjgl-vma"
+        implementation "org.lwjgl:lwjgl-vulkan"
+
+        runtimeOnly "org.lwjgl:lwjgl::$lwjglNatives"
+        runtimeOnly "org.lwjgl:lwjgl-glfw::$lwjglNatives"
+        runtimeOnly "org.lwjgl:lwjgl-stb::$lwjglNatives"
+        runtimeOnly "org.lwjgl:lwjgl-vma::$lwjglNatives"
+    }
+}
+
+project(':gruviks') {
+    dependencies {
+        implementation project(':graviks2d')
+        implementation 'com.github.knokko:vk-boiler:v1.0.0'
+    }
+}
+
+project(':gruviks-glfw') {
+    dependencies {
+        implementation project(':graviks2d')
+        implementation project(':gruviks')
+        implementation project(':graviks-glfw')
+        implementation 'com.github.knokko:vk-boiler:v1.0.0'
+
+        implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
+        implementation "org.lwjgl:lwjgl"
+        implementation "org.lwjgl:lwjgl-glfw"
+        runtimeOnly "org.joml:joml:${jomlVersion}"
+
+        testImplementation "org.lwjgl:lwjgl-vulkan"
+        testImplementation 'com.github.knokko:sample-profiler:v1.0.0'
+        testImplementation 'com.github.knokko:memory-query:v1.0'
+    }
+}
+
+project(':dsl-playground') {
+    dependencies {
+        implementation project(':graviks2d')
+        implementation project(':graviks-glfw')
+        implementation project(':gruviks')
+        implementation project(':gruviks-glfw')
+        implementation 'com.github.knokko:vk-boiler:v1.0.0'
+        implementation 'com.github.knokko:sample-profiler:v1.0.0'
+        implementation 'org.antlr:antlr4:4.13.0'
+        implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
+        compileOnly "org.lwjgl:lwjgl-glfw"
+    }
+}

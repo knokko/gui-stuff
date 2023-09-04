@@ -1,0 +1,2 @@
+rootProject.name = 'gui-stuff'
+include 'graviks2d', 'gruviks', 'graviks-glfw', 'gruviks-glfw', 'dsl-playground'

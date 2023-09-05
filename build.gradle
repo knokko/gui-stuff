@@ -87,6 +87,10 @@ project(':graviks2d') {
         testImplementation 'com.github.knokko:vk-boiler:v1.0.0'
         testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
     }
+
+    artifacts {
+        archives shadowJar
+    }
 }
 
 project(':graviks-glfw') {

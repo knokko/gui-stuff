@@ -20,6 +20,9 @@ import graviks2d.util.Color
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.runBlocking
 import org.lwjgl.system.MemoryStack.stackPush
+import org.lwjgl.vulkan.VK10.VK_PHYSICAL_DEVICE_TYPE_CPU
+import org.lwjgl.vulkan.VK10.vkGetPhysicalDeviceProperties
+import org.lwjgl.vulkan.VkPhysicalDeviceProperties
 import kotlin.IllegalStateException
 import kotlin.math.min
 import kotlin.math.max
@@ -97,6 +100,8 @@ class GraviksContext(
 
     private var currentScissor: GraviksScissor
 
+    private val usesCpu: Boolean
+
     init {
         if (vertexBufferSize < 6) throw IllegalArgumentException("vertexBufferSize must be at least 6")
         if (operationBufferSize < 6) throw IllegalArgumentException("operationBufferSize must be at least 6")
@@ -111,6 +116,12 @@ class GraviksContext(
         }
         currentVertexIndex = 6 // The first 6 vertices are used for the color clear
         currentOperationIndex = 6 // The first 6 operation values are used for the color clear and default scissor
+
+        stackPush().use { stack ->
+            val deviceProperties = VkPhysicalDeviceProperties.calloc(stack)
+            vkGetPhysicalDeviceProperties(instance.boiler.vkPhysicalDevice(), deviceProperties)
+            usesCpu = deviceProperties.deviceType() == VK_PHYSICAL_DEVICE_TYPE_CPU
+        }
     }
 
     private fun encodeFloat(value: Float) = (1_000_000.toFloat() * value).roundToInt()
@@ -572,8 +583,11 @@ class GraviksContext(
         imageSrcUsage: ResourceUsage? = null, imageDstUsage: ResourceUsage? = null,
         shouldAwaitCompletion: Boolean
     ) {
+        // For some reason, lavapipe crashes if I don't block
+        val shouldBlock = usesCpu
+
         handlePendingCommand()
-        hardFlush(false)
+        hardFlush(shouldBlock)
         commands.copyColorImageTo(
             destImage = destImage, destBuffer = destBuffer, destImageFormat = destImageFormat,
             signalSemaphore = signalSemaphore, submissionMarker = submissionMarker,

@@ -31,3 +31,9 @@ jobs:
         with:
           name: test-results
           path: build/reports
+      - name: Get JVM crash reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: crash-reports
+          path: graviks2d/hs_err_pid**.log

@@ -36,7 +36,7 @@ private val toggleButtonStyle = TextButtonStyle(
 )
 
 private fun createMenu(): SimpleFlatMenu {
-    val tree = TreeViewController.Node(File("troll-demos"), null)
+    val tree = TreeViewController.Node(File("pm2-models"), null)
     val menu = SimpleFlatMenu(SpaceLayout.GrowDown, Color.rgbInt(60, 60, 100))
     menu.addController(TreeViewController(
         tree,

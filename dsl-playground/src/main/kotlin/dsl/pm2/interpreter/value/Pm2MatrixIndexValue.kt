@@ -7,5 +7,5 @@ class Pm2MatrixIndexValue(internal val index: Int) : Pm2Value() {
 
     override fun hashCode() = this.index
 
-    override fun toString() = "Pm2MatrixIndex($index)"
+    override fun toString() = "PmMatrixIndex($index)"
 }

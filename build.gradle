@@ -139,3 +139,9 @@ project(':dsl-playground') {
         runtimeOnly "org.lwjgl:lwjgl-glfw::$lwjglNatives"
     }
 }
+
+project(':proc-model-core') {
+    dependencies {
+        implementation project(':graviks2d') // TODO Move graviks2d.Color to separate module and depend on that instead
+    }
+}

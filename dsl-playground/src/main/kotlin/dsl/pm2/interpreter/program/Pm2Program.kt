@@ -13,7 +13,15 @@ import kotlin.jvm.Throws
 
 class Pm2Program(
     val instructions: List<Pm2Instruction>,
+    /**
+     * A list of instructions blocks: the instruction block with index N contains the instructions to construct dynamic
+     * matrix N
+     */
     val dynamicBlocks: List<List<Pm2Instruction>>,
+    /**
+     * A list of instructions blocks: the instruction block with index N contains the instructions to convert
+     * the dynamic parameters of this (parent) model to the dynamic parameters of child model N
+     */
     val dynamicChildParameterBlocks: List<List<Pm2Instruction>>,
     val staticParameters: Map<String, Pm2Type>,
     val dynamicParameters: Map<String, Pm2Type>
@@ -57,6 +65,13 @@ class Pm2Program(
                     throw Pm2CompileError(cancelled.message ?: cancelled.cause?.message ?: "unknown")
                 }
             }
+
+            // footMatrix, footAngle
+            println("dynamic blocks are ${converter.program.dynamicBlocks.size}")
+
+            // params, kneeAngle
+            println("dynamic child parameter blocks are ${converter.program.dynamicChildParameterBlocks.size}")
+            println()
 
             return converter.program
         }

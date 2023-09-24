@@ -4,7 +4,7 @@ import procmodel.exceptions.PmRuntimeError
 
 class PmMap: PmValue() {
 
-    internal val map = mutableMapOf<PmValue, PmValue>()
+    val map = mutableMapOf<PmValue, PmValue>()
 
     override fun copy(): PmValue {
         val copy = PmMap()

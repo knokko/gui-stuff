@@ -13,6 +13,15 @@ abstract class PmValue {
         }
     }
 
+    @Throws(PmRuntimeError::class)
+    fun <T> castTo(expected: Class<T>): T {
+        if (expected.isInstance(this)) {
+            return expected.cast(this)
+        } else {
+            throw PmRuntimeError("Expected ${expected.simpleName}, but found $this")
+        }
+    }
+
     abstract fun copy(): PmValue
 
     @Throws(PmRuntimeError::class)

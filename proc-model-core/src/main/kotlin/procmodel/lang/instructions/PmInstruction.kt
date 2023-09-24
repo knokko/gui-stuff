@@ -61,7 +61,7 @@ class PmInstruction private constructor(
 
         fun delete(lineNumber: Int) = PmInstruction(PmInstructionType.Delete, lineNumber)
 
-        fun declareVariabale(name: String, type: PmType, lineNumber: Int) = PmInstruction(
+        fun declareVariable(name: String, type: PmType, lineNumber: Int) = PmInstruction(
             PmInstructionType.DeclareVariable, lineNumber, variableType = type, name = name
         )
 

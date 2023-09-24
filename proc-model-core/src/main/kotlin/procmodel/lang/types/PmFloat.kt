@@ -39,4 +39,6 @@ class PmFloat(private val value: Float) : PmValue() {
     override fun toString() = "PmFloat($value)"
 
     override fun copy() = this
+
+    override fun equals(other: Any?) = other is PmFloat && this.value == other.value
 }

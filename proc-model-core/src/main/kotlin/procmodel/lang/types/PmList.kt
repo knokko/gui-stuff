@@ -8,6 +8,10 @@ class PmList(val elements: MutableList<PmValue>): PmValue() {
 
     override fun copy() = PmList(elements.map { it.copy() }.toMutableList())
 
+    override fun equals(other: Any?) = other is PmList && this.elements == other.elements
+
+    override fun hashCode() = elements.hashCode()
+
     override fun getProperty(propertyName: String): PmValue {
         if (propertyName == "size") return PmInt(elements.size)
         else throw PmRuntimeError("Unknown property: List.$propertyName")

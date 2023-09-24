@@ -1,6 +1,6 @@
 package procmodel.lang.types
 
-class PmString(internal val value: String): PmValue() {
+class PmString(val value: String): PmValue() {
 
     override fun copy() = this
 

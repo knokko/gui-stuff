@@ -18,7 +18,7 @@ abstract class PmProcessor(
     protected val valueStack = mutableListOf<PmValue>()
 
     @Throws(PmRuntimeError::class)
-    protected fun executeInstructions() {
+    protected open fun executeInstructions() {
         variables.pushScope()
 
         var instructionIndex = 0

@@ -41,40 +41,19 @@ class PmVertexProcessor<VertexValue : PmValue, Vertex>(
         return PmModel(vertices.map(finishVertex), dynamicMatrices, program.dynamicParameters)
     }
 
-    private fun initializeStaticParameters(rawStaticParameters: PmValue, staticParameters: Map<String, PmType>) {
+    private fun initializeStaticParameters(rawStaticParameters: PmValue, staticParameterTypes: Map<String, PmType>) {
         val staticParameterValues = mutableMapOf<String, PmValue>()
-        if (staticParameters.isEmpty()) {
-            if (rawStaticParameters is PmMap) {
-                if (rawStaticParameters.map.isNotEmpty()) {
-                    throw PmRuntimeError("No parameters needed, but ${rawStaticParameters.map.size} were specified")
-                }
-            } else if (rawStaticParameters !is PmNone) {
-                throw PmRuntimeError("No parameters expected, but got $rawStaticParameters")
-            }
-        } else {
-            if (rawStaticParameters !is PmMap) {
-                throw PmRuntimeError("Expected a Map of parameters, but got $rawStaticParameters")
-            }
-            for (key in rawStaticParameters.map.keys) {
-                if (key !is PmString) throw PmRuntimeError("All static parameter keys should be strings, but found $key")
-                if (!staticParameters.containsKey(key.value)) throw PmRuntimeError("Unexpected static parameter $key")
-            }
 
-            for ((key, expectedType) in staticParameters) {
-                val value = rawStaticParameters.map[PmString(key)] ?:
-                throw PmRuntimeError("Missing static parameter $key")
-                if (!expectedType.acceptValue(value)) {
-                    throw PmRuntimeError("Type $expectedType of static parameter $key doesn't accept $value")
-                }
-                staticParameterValues[key] = value
+        if (rawStaticParameters is PmMap) {
+            for ((key, value) in rawStaticParameters.map) {
+                if (key is PmString) staticParameterValues[key.value] = value
+                else throw PmRuntimeError("All static parameter keys must be strings, but got $key")
             }
+        } else if (rawStaticParameters !is PmNone) {
+            throw PmRuntimeError("Static parameters must be a PmMap or PmNone, but got $rawStaticParameters")
         }
 
-        variables.pushScope()
-        for ((key, value) in staticParameterValues) {
-            val type = staticParameters[key] ?: throw PmRuntimeError("Unknown static parameter $key")
-            variables.defineVariable(type, key, value.copy())
-        }
+        initializeParameters(variables, "static", staticParameterTypes, staticParameterValues)
     }
 
     override fun executeInstruction(instruction: PmInstruction) {

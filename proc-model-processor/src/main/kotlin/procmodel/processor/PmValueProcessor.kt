@@ -5,13 +5,13 @@ import procmodel.lang.types.PmNone
 import procmodel.lang.types.PmValue
 import procmodel.program.PmProgramBody
 
-class PmValueProcessor(
+open class PmValueProcessor(
     body: PmProgramBody,
 ): PmProcessor(body) {
 
     var result: PmValue? = null
 
-    fun execute() {
+    open fun execute() {
         executeInstructions()
 
         if (valueStack.isNotEmpty()) throw IllegalStateException("Value stack should be empty")

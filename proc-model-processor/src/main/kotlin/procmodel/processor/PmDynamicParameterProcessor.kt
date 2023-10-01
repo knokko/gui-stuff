@@ -1,6 +1,7 @@
 package procmodel.processor
 
 import procmodel.exceptions.PmRuntimeError
+import procmodel.lang.instructions.PmInstruction
 import procmodel.lang.types.PmMap
 import procmodel.lang.types.PmString
 import procmodel.lang.types.PmType
@@ -11,29 +12,21 @@ internal class PmDynamicParameterProcessor(
     body: PmProgramBody,
     private val dynamicParentParameterValues: Map<String, PmValue>,
     private val dynamicParentParameterTypes: Map<String, PmType>
-): PmProcessor(body) {
+): PmValueProcessor(body) {
 
-    val result = mutableMapOf<String, PmValue>()
-
-    fun execute() {
-        variables.pushScope()
-        for ((key, value) in dynamicParentParameterValues) {
-            variables.defineVariable(dynamicParentParameterTypes[key]!!, key, value.copy())
-        }
-        executeInstructions()
-
-        val resultMap = valueStack.removeLast()
-        if (resultMap is PmMap) {
-            for ((key, value) in resultMap.map) {
-                if (key !is PmString) throw PmRuntimeError("All dynamic parameter map keys must be strings, but got $key")
-                result[key.value] = value
-            }
-        } else {
-            throw PmRuntimeError("Expected dynamic parameter map, but got $resultMap")
-        }
-
-        if (valueStack.isNotEmpty()) throw IllegalStateException("Value stack should be empty")
+    override fun executeInstructions() {
+        initializeParameters(variables, "dynamic", dynamicParentParameterTypes, dynamicParentParameterValues)
+        super.executeInstructions()
         variables.popScope()
-        if (variables.hasScope()) throw IllegalStateException("All scopes should have been popped")
+    }
+
+    override fun execute() {
+        super.execute()
+
+        val finalResult = result ?: throw PmRuntimeError("The outputValue function wasn't called")
+        if (finalResult !is PmMap) throw PmRuntimeError("The result must be a PmMap, but is $finalResult")
+        for (key in finalResult.map.keys) {
+            if (key !is PmString) throw PmRuntimeError("All keys in the result map must be strings, but found $key")
+        }
     }
 }

@@ -137,6 +137,7 @@ project(':dsl-playground') {
         runtimeOnly "org.lwjgl:lwjgl-vma::$lwjglNatives"
         if (lwjglNatives == "natives-macos") runtimeOnly "org.lwjgl:lwjgl-vulkan::$lwjglNatives"
         runtimeOnly "org.lwjgl:lwjgl-glfw::$lwjglNatives"
+        runtimeOnly "org.lwjgl:lwjgl-stb::$lwjglNatives"
     }
 }
 

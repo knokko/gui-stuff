@@ -1,13 +1,13 @@
 package graviks2d.resource.text
 
-import com.github.knokko.boiler.instance.BoilerInstance
+import com.github.knokko.boiler.commands.CommandRecorder
 import com.github.knokko.boiler.sync.ResourceUsage
 import org.lwjgl.system.MemoryStack.stackPush
 import org.lwjgl.vulkan.*
 import org.lwjgl.vulkan.VK10.*
 
 internal fun rasterizeTextAtlas(
-    boiler: BoilerInstance, commandBuffer: VkCommandBuffer, textCache: TextShapeCache, isFirstDraw: Boolean
+    recorder: CommandRecorder, commandBuffer: VkCommandBuffer, textCache: TextShapeCache, isFirstDraw: Boolean
 ) {
     stackPush().use { stack ->
 
@@ -29,7 +29,7 @@ internal fun rasterizeTextAtlas(
 
             if (textCache.currentVertexIndex > 0) {
                 vkCmdBeginRenderPass(commandBuffer, biRenderPass, VK_SUBPASS_CONTENTS_INLINE)
-                boiler.commands.dynamicViewportAndScissor(stack, commandBuffer, textCache.width, textCache.height)
+                recorder.dynamicViewportAndScissor(textCache.width, textCache.height)
                 vkCmdBindPipeline(
                         commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
                         textCache.context.instance.textPipelines.countPipeline
@@ -59,8 +59,8 @@ internal fun rasterizeTextAtlas(
                 oldUsage = null
             }
 
-            boiler.commands.transitionColorLayout(
-                    stack, commandBuffer, textCache.textOddAtlas.vkImage, oldLayout,
+            recorder.transitionColorLayout(
+                    textCache.textOddAtlas.vkImage, oldLayout,
                     VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
                     oldUsage, ResourceUsage(VK_ACCESS_SHADER_READ_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT)
             )

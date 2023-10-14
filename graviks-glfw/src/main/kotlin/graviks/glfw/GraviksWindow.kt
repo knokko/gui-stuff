@@ -191,6 +191,6 @@ class GraviksWindow(
     fun destroy() {
         if (currentGraviksContext != null) currentGraviksContext!!.destroy()
         graviksInstance.destroy()
-        boiler.destroy()
+        boiler.destroyInitialObjects()
     }
 }

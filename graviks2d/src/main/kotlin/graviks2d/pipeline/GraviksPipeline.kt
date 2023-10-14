@@ -1,13 +1,12 @@
 package graviks2d.pipeline
 
-import com.github.knokko.boiler.exceptions.VulkanFailureException.assertVkSuccess
+import com.github.knokko.boiler.pipelines.GraphicsPipelineBuilder
 import com.github.knokko.boiler.pipelines.ShaderInfo
 import graviks2d.context.TARGET_COLOR_FORMAT
 import graviks2d.core.GraviksInstance
 import org.lwjgl.system.MemoryStack.stackPush
 import org.lwjgl.vulkan.VK10.*
 import org.lwjgl.vulkan.VkDescriptorSetLayoutBinding
-import org.lwjgl.vulkan.VkGraphicsPipelineCreateInfo
 
 
 internal class GraviksPipeline(
@@ -62,33 +61,25 @@ internal class GraviksPipeline(
                 stack, "graviks2d/shaders/basic.frag.spv", "GraviksBasicFragmentShader"
             )
 
-            val ciPipelines = VkGraphicsPipelineCreateInfo.calloc(1, stack)
-            val ciPipeline = ciPipelines[0]
-            ciPipeline.`sType$Default`()
-            instance.boiler.pipelines.shaderStages(
-                stack, ciPipeline,
+            val builder = GraphicsPipelineBuilder(instance.boiler, stack)
+            builder.shaderStages(
                 ShaderInfo(VK_SHADER_STAGE_VERTEX_BIT, vertexShader, null),
                 ShaderInfo(VK_SHADER_STAGE_FRAGMENT_BIT, fragmentShader, null)
             )
-            ciPipeline.pVertexInputState(createGraviksPipelineVertexInput(stack))
-            instance.boiler.pipelines.simpleInputAssembly(stack, ciPipeline)
-            instance.boiler.pipelines.dynamicViewports(stack, ciPipeline, 1)
-            instance.boiler.pipelines.dynamicStates(
-                stack, ciPipeline, VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR
+            builder.ciPipeline.pVertexInputState(createGraviksPipelineVertexInput(stack))
+            builder.simpleInputAssembly()
+            builder.dynamicViewports(1)
+            builder.dynamicStates(
+                VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR
             )
-            instance.boiler.pipelines.simpleRasterization(stack, ciPipeline, VK_CULL_MODE_NONE)
-            instance.boiler.pipelines.noMultisampling(stack, ciPipeline)
-            instance.boiler.pipelines.simpleColorBlending(stack, ciPipeline, 1)
-            ciPipeline.layout(vkPipelineLayout)
-            ciPipeline.renderPass(vkRenderPass)
-            ciPipeline.subpass(0)
+            builder.simpleRasterization(VK_CULL_MODE_NONE)
+            builder.noMultisampling()
+            builder.simpleColorBlending(1)
+            builder.ciPipeline.layout(vkPipelineLayout)
+            builder.ciPipeline.renderPass(vkRenderPass)
+            builder.ciPipeline.subpass(0)
 
-            val pPipeline = stack.callocLong(1)
-            assertVkSuccess(
-                vkCreateGraphicsPipelines(instance.boiler.vkDevice(), VK_NULL_HANDLE, ciPipelines, null, pPipeline),
-                "vkCreateGraphicsPipeline", "GraviksCore"
-            )
-            this.vkPipeline = pPipeline[0]
+            this.vkPipeline = builder.build("GraviksCore")
 
             vkDestroyShaderModule(instance.boiler.vkDevice(), vertexShader, null)
             vkDestroyShaderModule(instance.boiler.vkDevice(), fragmentShader, null)

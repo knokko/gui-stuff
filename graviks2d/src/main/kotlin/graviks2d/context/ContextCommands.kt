@@ -1,5 +1,6 @@
 package graviks2d.context
 
+import com.github.knokko.boiler.commands.CommandRecorder
 import com.github.knokko.boiler.exceptions.VulkanFailureException.assertVkSuccess
 import com.github.knokko.boiler.sync.ResourceUsage
 import com.github.knokko.boiler.sync.WaitSemaphore
@@ -37,7 +38,7 @@ internal class ContextCommands(
         this.initImageLayouts()
     }
 
-    private fun resetBeginCommandBuffer(stack: MemoryStack) {
+    private fun resetBeginCommandBuffer(stack: MemoryStack): CommandRecorder {
 
         if (isStillRecording) throw IllegalStateException("Already recording commands")
 
@@ -48,8 +49,8 @@ internal class ContextCommands(
             "vkResetCommandPool", "ContextCommands"
         )
 
-        context.instance.boiler.commands.begin(commandBuffer, stack, "GraviksContextCommands")
         isStillRecording = true
+        return CommandRecorder.begin(commandBuffer, context.instance.boiler, stack, "GraviksContextCommands")
     }
 
     private fun endSubmitCommandBuffer(
@@ -97,10 +98,10 @@ internal class ContextCommands(
     private fun initImageLayouts() {
         stackPush().use { stack ->
 
-            resetBeginCommandBuffer(stack)
+            val recorder = resetBeginCommandBuffer(stack)
 
-            context.instance.boiler.commands.transitionColorLayout(
-                stack, commandBuffer, context.targetImages.colorImage.vkImage,
+            recorder.transitionColorLayout(
+                context.targetImages.colorImage.vkImage,
                 VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, null,
                 ResourceUsage(VK_ACCESS_COLOR_ATTACHMENT_READ_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT)
             )
@@ -120,13 +121,13 @@ internal class ContextCommands(
         stackPush().use { stack ->
             if (hasPendingSubmission) throw IllegalStateException("Still has pending submission")
 
-            if (!isStillRecording) {
-                resetBeginCommandBuffer(stack)
-            }
-
             val boiler = context.instance.boiler
-            boiler.commands.transitionColorLayout(
-                stack, commandBuffer, context.targetImages.colorImage.vkImage,
+            val recorder = if (!isStillRecording) {
+                resetBeginCommandBuffer(stack)
+            } else CommandRecorder.alreadyRecording(commandBuffer, boiler, stack)
+
+            recorder.transitionColorLayout(
+                context.targetImages.colorImage.vkImage,
                 VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
                 ResourceUsage(VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT),
                 ResourceUsage(VK_ACCESS_TRANSFER_READ_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT)
@@ -143,42 +144,42 @@ internal class ContextCommands(
                 checkPresent(finalImageLayout, "finalImageLayout")
 
                 if (originalImageLayout != VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
-                    boiler.commands.transitionColorLayout(
-                        stack, commandBuffer, destImage, originalImageLayout!!, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                    recorder.transitionColorLayout(
+                        destImage, originalImageLayout!!, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                             imageSrcUsage, ResourceUsage(VK_ACCESS_TRANSFER_WRITE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT)
                     )
                 }
 
                 if (destImageFormat == TARGET_COLOR_FORMAT) {
-                    boiler.commands.copyImage(
-                        commandBuffer, stack, context.width, context.height, VK_IMAGE_ASPECT_COLOR_BIT,
+                    recorder.copyImage(
+                        context.width, context.height, VK_IMAGE_ASPECT_COLOR_BIT,
                         context.targetImages.colorImage.vkImage, destImage
                     )
                 } else {
-                    boiler.commands.blitImage(
-                        commandBuffer, stack, VK_IMAGE_ASPECT_COLOR_BIT, VK_FILTER_NEAREST,
+                    recorder.blitImage(
+                        VK_IMAGE_ASPECT_COLOR_BIT, VK_FILTER_NEAREST,
                         context.targetImages.colorImage.vkImage, context.width, context.height,
                         destImage, context.width, context.height
                     )
                 }
 
                 if (finalImageLayout != VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
-                    boiler.commands.transitionColorLayout(
-                        stack, commandBuffer, destImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, finalImageLayout!!,
+                    recorder.transitionColorLayout(
+                        destImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, finalImageLayout!!,
                         ResourceUsage(VK_ACCESS_TRANSFER_WRITE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT), imageDstUsage
                     )
                 }
             }
 
             if (destBuffer != null) {
-                boiler.commands.copyImageToBuffer(
-                    commandBuffer, stack, VK_IMAGE_ASPECT_COLOR_BIT, context.targetImages.colorImage.vkImage,
+                recorder.copyImageToBuffer(
+                    VK_IMAGE_ASPECT_COLOR_BIT, context.targetImages.colorImage.vkImage,
                     context.width, context.height, destBuffer
                 )
             }
 
-            boiler.commands.transitionColorLayout(
-                stack, commandBuffer, context.targetImages.colorImage.vkImage,
+            recorder.transitionColorLayout(
+                context.targetImages.colorImage.vkImage,
                 VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
                 ResourceUsage(VK_ACCESS_TRANSFER_READ_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT),
                 ResourceUsage(VK_ACCESS_COLOR_ATTACHMENT_READ_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT)
@@ -195,11 +196,11 @@ internal class ContextCommands(
     fun draw(drawCommands: List<DrawCommand>, endSubmitAndWait: Boolean) {
         stackPush().use { stack ->
 
-            if (hasDrawnBefore) {
+            val recorder = if (hasDrawnBefore) {
                 resetBeginCommandBuffer(stack)
-            }
+            } else CommandRecorder.alreadyRecording(commandBuffer, context.instance.boiler, stack)
 
-            rasterizeTextAtlas(context.instance.boiler, commandBuffer, this.context.textShapeCache, !hasDrawnBefore)
+            rasterizeTextAtlas(recorder, commandBuffer, this.context.textShapeCache, !hasDrawnBefore)
 
             hasDrawnBefore = true
 

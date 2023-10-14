@@ -2,6 +2,7 @@ package graviks2d
 
 import com.github.knokko.boiler.builder.BoilerBuilder
 import com.github.knokko.boiler.builder.instance.ValidationFeatures
+import com.github.knokko.boiler.commands.CommandRecorder
 import com.github.knokko.boiler.exceptions.VulkanFailureException.assertVkSuccess
 import com.github.knokko.boiler.images.VmaImage
 import com.github.knokko.boiler.sync.ResourceUsage
@@ -726,13 +727,13 @@ class TestContext {
                 VK_COMMAND_POOL_CREATE_TRANSIENT_BIT, boiler.queueFamilies().graphics.index, "TestCopy"
             )
             val commandBuffer = boiler.commands.createPrimaryBuffers(commandPool, 1, "TestCopy")[0]
-            boiler.commands.begin(commandBuffer, stack, "TestGraviksContextCopy")
-            boiler.commands.copyImageToBuffer(
-                commandBuffer, stack, VK_IMAGE_ASPECT_COLOR_BIT, destImage.vkImage,
+            val recorder = CommandRecorder.begin(commandBuffer, boiler, stack, "TestGraviksContextCopy")
+            recorder.copyImageToBuffer(
+                VK_IMAGE_ASPECT_COLOR_BIT, destImage.vkImage,
                 graviks.width, graviks.height, destBuffer.vkBuffer
             )
+            recorder.end()
 
-            assertVkSuccess(vkEndCommandBuffer(commandBuffer), "vkEndCommandBuffer", "TestGraviksContextCopy")
             val copyFence = boiler.sync.createFences(false, 1, "TestGraviksContextCopyFence")[0]
             boiler.queueFamilies().graphics.queues.random().submit(
                 commandBuffer, "TestContext.testBlitColorImage", emptyArray(), copyFence
@@ -765,6 +766,6 @@ class TestContext {
     @AfterAll
     fun destroyGraviksInstance() {
         this.graviksInstance.destroy()
-        this.boiler.destroy()
+        this.boiler.destroyInitialObjects()
     }
 }

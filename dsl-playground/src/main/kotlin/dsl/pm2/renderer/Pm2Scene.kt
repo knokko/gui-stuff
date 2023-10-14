@@ -1,6 +1,7 @@
 package dsl.pm2.renderer
 
 import com.github.knokko.boiler.buffer.VmaBuffer
+import com.github.knokko.boiler.commands.CommandRecorder
 import com.github.knokko.boiler.exceptions.VulkanFailureException.assertVkSuccess
 import com.github.knokko.boiler.images.VmaImage
 import com.github.knokko.boiler.instance.BoilerInstance
@@ -234,7 +235,7 @@ class Pm2Scene internal constructor(
                 boiler.vkDevice(), commandPool, 0
             ), "ResetCommandPool", "Pm2SceneDrawCommandPool")
 
-            boiler.commands.begin(commandBuffer, stack, "Pm2SceneDrawCommands")
+            val recorder = CommandRecorder.begin(commandBuffer, boiler, stack, "Pm2SceneDrawCommands")
 
             var matrixIndex = 0
             val meshesWithMatrixIndices = mutableListOf<Pair<Pm2Mesh, Int>>()
@@ -256,8 +257,8 @@ class Pm2Scene internal constructor(
             }
             vkCmdUpdateBuffer(commandBuffer, matrixBuffer!!.vkBuffer, 0, hostMatrixBuffer)
 
-            boiler.commands.bufferBarrier(
-                stack, commandBuffer, matrixBuffer!!.vkBuffer, 0, matrixBuffer!!.size,
+            recorder.bufferBarrier(
+                matrixBuffer!!.vkBuffer, 0, matrixBuffer!!.size,
                 ResourceUsage(VK_ACCESS_TRANSFER_WRITE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT),
                 ResourceUsage(VK_ACCESS_SHADER_READ_BIT, VK_PIPELINE_STAGE_VERTEX_SHADER_BIT)
             )
@@ -278,15 +279,15 @@ class Pm2Scene internal constructor(
             biRenderPass.pClearValues(clearValues)
 
             vkCmdBeginRenderPass(commandBuffer, biRenderPass, VK_SUBPASS_CONTENTS_INLINE)
-            boiler.commands.dynamicViewportAndScissor(stack, commandBuffer, width, height)
+            recorder.dynamicViewportAndScissor(width, height)
 
             instance.recordDraw(commandBuffer, pipelineInfo, descriptorSet, meshesWithMatrixIndices, cameraMatrix)
 
             vkCmdEndRenderPass(commandBuffer)
 
             if (oldLayout != VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
-                boiler.commands.transitionColorLayout(
-                    stack, commandBuffer, destImage, oldLayout, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                recorder.transitionColorLayout(
+                    destImage, oldLayout, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                     ResourceUsage(srcAccessMask, srcStageMask),
                     ResourceUsage(VK_ACCESS_TRANSFER_WRITE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT)
                 )
@@ -306,8 +307,8 @@ class Pm2Scene internal constructor(
             )
 
             if (newLayout != VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
-                boiler.commands.transitionColorLayout(
-                    stack, commandBuffer, destImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, newLayout,
+                recorder.transitionColorLayout(
+                    destImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, newLayout,
                     ResourceUsage(VK_ACCESS_TRANSFER_WRITE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT),
                     ResourceUsage(dstAccessMask, dstStageMask)
                 )

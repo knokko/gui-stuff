@@ -1,5 +1,6 @@
 package graviks2d.resource.image
 
+import com.github.knokko.boiler.commands.CommandRecorder
 import com.github.knokko.boiler.exceptions.VulkanFailureException.assertVkSuccess
 import com.github.knokko.boiler.images.VmaImage
 import com.github.knokko.boiler.sync.ResourceUsage
@@ -61,22 +62,21 @@ internal fun createImagePair(
             VK_COMMAND_POOL_CREATE_TRANSIENT_BIT, instance.boiler.queueFamilies().graphics.index, "$name-transfer"
         )
         val commandBuffer = instance.boiler.commands.createPrimaryBuffers(commandPool, 1, "$name-transfer")[0]
-        instance.boiler.commands.begin(commandBuffer, stack, "$name-transfer")
-        instance.boiler.commands.transitionColorLayout(
-            stack, commandBuffer, image.vkImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+        val recorder = CommandRecorder.begin(commandBuffer, instance.boiler, stack, "GraviksImageFactory-$name")
+        recorder.transitionColorLayout(
+            image.vkImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
             null, ResourceUsage(VK_ACCESS_TRANSFER_WRITE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT)
         )
-        instance.boiler.commands.copyBufferToImage(
-            commandBuffer, stack, VK_IMAGE_ASPECT_COLOR_BIT, image.vkImage, width, height, stagingBuffer.vkBuffer
+        recorder.copyBufferToImage(
+            VK_IMAGE_ASPECT_COLOR_BIT, image.vkImage, width, height, stagingBuffer.vkBuffer
         )
-        instance.boiler.commands.transitionColorLayout(
-            stack, commandBuffer, image.vkImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+        recorder.transitionColorLayout(
+            image.vkImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
             VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
             ResourceUsage(VK_ACCESS_TRANSFER_WRITE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT),
             ResourceUsage(VK_ACCESS_SHADER_READ_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT)
         )
-
-        assertVkSuccess(vkEndCommandBuffer(commandBuffer), "vkEndCommandBuffer", "GraviksImageFactory-$name")
+        recorder.end()
 
         val fence = instance.boiler.sync.createFences(false, 1, "fence-transfer-$name")[0]
 

@@ -6,10 +6,11 @@ import procmodel.lang.types.PmValue
 
 class PmBuiltinFunction(
     val parameterTypes: List<PmType>,
-    val returnType: PmType
+    val returnType: PmType,
+    val implementation: (List<PmValue>) -> PmValue
 ) {
 
-    fun invoke(valueStack: MutableList<PmValue>, implementation: (List<PmValue>) -> PmValue) {
+    fun invoke(valueStack: MutableList<PmValue>) {
         val parameterValues = parameterTypes.indices.map { valueStack.removeLast() }.reversed()
         for ((index, type) in parameterTypes.withIndex()) {
             if (!type.acceptValue(parameterValues[index])) {

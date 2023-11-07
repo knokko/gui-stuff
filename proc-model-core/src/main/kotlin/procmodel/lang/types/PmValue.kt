@@ -1,6 +1,8 @@
 package procmodel.lang.types
 
 import procmodel.exceptions.PmRuntimeError
+import kotlin.reflect.KClass
+import kotlin.reflect.cast
 
 abstract class PmValue {
 
@@ -14,7 +16,7 @@ abstract class PmValue {
     }
 
     @Throws(PmRuntimeError::class)
-    fun <T> castTo(expected: Class<T>): T {
+    fun <T : Any> castTo(expected: KClass<T>): T {
         if (expected.isInstance(this)) {
             return expected.cast(this)
         } else {

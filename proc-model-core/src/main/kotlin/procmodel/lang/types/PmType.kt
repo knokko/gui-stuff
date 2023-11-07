@@ -8,4 +8,6 @@ class PmType(
     val valueClass: KClass<*>
 ) {
     fun acceptValue(value: PmValue) = valueClass.isInstance(value)
+
+    override fun toString() = name
 }

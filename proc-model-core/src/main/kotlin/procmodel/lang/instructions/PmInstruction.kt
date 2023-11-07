@@ -27,6 +27,38 @@ class PmInstruction private constructor(
      */
     val name: String? = null
 ) {
+
+    override fun toString(): String {
+        val name = "\"${this.name}\""
+        return when (type) {
+            PmInstructionType.PushValue -> "pushValue($value, $lineNumber)"
+            PmInstructionType.PushVariable -> "pushVariable($name, $lineNumber)"
+            PmInstructionType.PushProperty -> "pushProperty($name, $lineNumber)"
+            PmInstructionType.ReadListOrMap -> "readListOrMap($lineNumber)"
+            PmInstructionType.Divide -> "divide($lineNumber)"
+            PmInstructionType.Multiply -> "multiply($lineNumber)"
+            PmInstructionType.Add -> "add($lineNumber)"
+            PmInstructionType.Subtract -> "subtract($lineNumber)"
+            PmInstructionType.SmallerThan -> "smallerThan($lineNumber)"
+            PmInstructionType.SmallerOrEqual -> "smallerOrEqual($lineNumber)"
+            PmInstructionType.Duplicate -> "duplicate($lineNumber)"
+            PmInstructionType.Swap -> "swap($lineNumber)"
+            PmInstructionType.Delete -> "delete($lineNumber)"
+            PmInstructionType.DeclareVariable -> "declareVariable($name, $variableType, $lineNumber)"
+            PmInstructionType.ReassignVariable -> "reassignVariable($name, $lineNumber)"
+            PmInstructionType.SetProperty -> "setProperty($name, $lineNumber)"
+            PmInstructionType.UpdateListOrMap -> "updateListOrMap($lineNumber)"
+            PmInstructionType.Jump -> "jump($lineNumber)"
+            PmInstructionType.InvokeBuiltinFunction -> "invokeBuiltinFunction($name, $lineNumber)"
+            PmInstructionType.TransferVariable -> "transferVariable($name, $variableType, $lineNumber)"
+            PmInstructionType.CreateDynamicMatrix -> "createDynamicMatrix($lineNumber)"
+            PmInstructionType.CreateChildModel -> "createChildModel($name, $lineNumber)"
+            PmInstructionType.ExitProgram -> "exitProgram($lineNumber)"
+            PmInstructionType.PushScope -> "pushScope($lineNumber)"
+            PmInstructionType.PopScope -> "popScope($lineNumber)"
+        }
+    }
+
     companion object {
         fun pushValue(value: PmValue, lineNumber: Int) = PmInstruction(
             PmInstructionType.PushValue, lineNumber, value = value

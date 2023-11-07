@@ -1,0 +1,27 @@
+import model ./triangle;
+
+static parameter float offsetX;
+static parameter float offsetY;
+static parameter color color1;
+static parameter color color2;
+
+dynamic parameter float distance;
+
+Map childParameters1;
+childParameters1["color"] = color1;
+
+Map childParameters2;
+childParameters2["color"] = color2;
+
+matrix downMatrix = dynamic Matrix <float offsetX, float offsetY> {
+	Matrix downMatrix;
+	translate(downMatrix, offsetX, offsetY - distance);
+	downMatrix
+};
+matrix upMatrix = dynamic Matrix <float offsetX, float offsetY>{
+	Matrix upMatrix;
+	translate(upMatrix, offsetX, offsetY + distance);
+	upMatrix
+};
+child model triangle(downMatrix, childParameters1);
+child model triangle(upMatrix, childParameters2);

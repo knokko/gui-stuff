@@ -1,6 +1,7 @@
 package procmodel.processor
 
-import procmodel.lang.functions.PmBuiltinFunctions
+import procmodel.lang.functions.PmBuiltinFunction
+import procmodel.lang.types.PmBuiltinTypes
 import procmodel.lang.types.PmNone
 import procmodel.lang.types.PmValue
 import procmodel.program.PmProgramBody
@@ -11,17 +12,16 @@ open class PmValueProcessor(
 
     var result: PmValue? = null
 
+    init {
+        addBuiltinFunction("outputValue", PmBuiltinFunction(listOf(PmBuiltinTypes.ANY), PmBuiltinTypes.VOID) {
+            value -> result = value[0]; PmNone()
+        })
+    }
+
     open fun execute() {
         executeInstructions()
 
         if (valueStack.isNotEmpty()) throw IllegalStateException("Value stack should be empty")
         if (variables.hasScope()) throw IllegalStateException("All scopes should have been popped")
-    }
-
-    override fun invokeBuiltinFunction(name: String) {
-        when (name) {
-            "outputValue" -> PmBuiltinFunctions.OUTPUT_VALUE.invoke(valueStack) { value -> result = value[0]; PmNone() }
-            else -> super.invokeBuiltinFunction(name)
-        }
     }
 }

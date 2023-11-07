@@ -29,4 +29,12 @@ class PmColor(private val red: Float, private val green: Float, private val blue
     override fun toString() = "rgb($red, $green, $blue)"
 
     override fun copy() = this
+
+    override fun equals(other: Any?) = other is PmColor && red == other.red && green == other.green && blue == other.blue
+    override fun hashCode(): Int {
+        var result = red.hashCode()
+        result = 31 * result + green.hashCode()
+        result = 31 * result + blue.hashCode()
+        return result
+    }
 }

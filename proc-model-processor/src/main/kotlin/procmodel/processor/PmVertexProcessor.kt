@@ -1,6 +1,7 @@
 package procmodel.processor
 
 import procmodel.exceptions.PmRuntimeError
+import procmodel.lang.functions.PmBuiltinFunction
 import procmodel.lang.functions.PmBuiltinFunctions
 import procmodel.lang.instructions.PmInstruction
 import procmodel.lang.instructions.PmInstructionType
@@ -10,11 +11,12 @@ import procmodel.model.PmModel
 import procmodel.program.PmProgram
 import procmodel.scope.PmVariableScope
 import kotlin.jvm.Throws
+import kotlin.reflect.KClass
 
 class PmVertexProcessor<VertexValue : PmValue, Vertex>(
     private val program: PmProgram,
     rawStaticParameters: PmValue,
-    private val vertexValueClass: Class<VertexValue>,
+    vertexType: PmType,
     private val finishVertex: (VertexValue) -> Vertex
 ): PmProcessor(program.body) {
 
@@ -27,6 +29,16 @@ class PmVertexProcessor<VertexValue : PmValue, Vertex>(
 
     init {
         initializeStaticParameters(rawStaticParameters, program.staticParameters)
+
+        @Suppress("UNCHECKED_CAST") // Checking parameter types is done in PmBuiltinFunction.invoke
+        addBuiltinFunction("produceTriangle", PmBuiltinFunction(
+            listOf(vertexType, vertexType, vertexType), PmBuiltinTypes.VOID
+        ) { parameters ->
+            vertices.add(parameters[0] as VertexValue)
+            vertices.add(parameters[1] as VertexValue)
+            vertices.add(parameters[2] as VertexValue)
+            PmNone()
+        })
     }
 
     @Throws(PmRuntimeError::class)
@@ -67,7 +79,7 @@ class PmVertexProcessor<VertexValue : PmValue, Vertex>(
 
     override fun handleChildModel(instruction: PmInstruction, currentInstructionIndex: Int): Int {
         val modelID = instruction.name!!
-        val childModel = program.children[modelID]!!
+        val childModel = program.children[modelID] ?: throw PmRuntimeError("Unknown child model $modelID")
 
         val dynamicChildBlockIndex = valueStack.removeLast().castTo<PmInt>().intValue()
         val staticParameters = valueStack.removeLast()
@@ -146,18 +158,6 @@ class PmVertexProcessor<VertexValue : PmValue, Vertex>(
 
         val variable = variables.getVariable(instruction.name!!) ?: throw PmRuntimeError("Unknown variable ${instruction.name}")
         transferVariables[instruction.name!!] = Pair(instruction.variableType!!, variable.copy())
-    }
-
-    override fun invokeBuiltinFunction(name: String) {
-        when (name) {
-            "produceTriangle" -> PmBuiltinFunctions.PRODUCE_TRIANGLE.invoke(valueStack) { parameters ->
-                vertices.add(parameters[0].castTo(vertexValueClass))
-                vertices.add(parameters[1].castTo(vertexValueClass))
-                vertices.add(parameters[2].castTo(vertexValueClass))
-                PmNone()
-            }
-            else -> super.invokeBuiltinFunction(name)
-        }
     }
 
     private class ProgramEntry<VertexValue : PmValue>(

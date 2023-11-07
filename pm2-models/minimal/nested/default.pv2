@@ -1,0 +1,6 @@
+Map parameters;
+parameters["offsetX"] = 0.5;
+parameters["offsetY"] = 0.0;
+parameters["color1"] = rgb(1.0, 0.0, 0.0);
+parameters["color2"] = rgb(0.0, 1.0, 0.0);
+outputValue(parameters);

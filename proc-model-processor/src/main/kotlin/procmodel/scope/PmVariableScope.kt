@@ -46,4 +46,6 @@ class PmVariableScope {
         }
         return null
     }
+
+    override fun toString() = "PmVariableScope(depth=${scopes.size}, top=${scopes.lastOrNull()})"
 }

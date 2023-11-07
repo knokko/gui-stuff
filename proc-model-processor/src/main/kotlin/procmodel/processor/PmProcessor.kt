@@ -1,9 +1,9 @@
 package procmodel.processor
 
 import procmodel.exceptions.PmRuntimeError
+import procmodel.lang.functions.PmBuiltinFunction
 import procmodel.lang.functions.PmBuiltinFunctions
 
-import org.joml.Math.*
 import procmodel.lang.instructions.PmInstruction
 import procmodel.lang.instructions.PmInstructionType
 import procmodel.lang.types.*
@@ -16,6 +16,12 @@ abstract class PmProcessor(
 ) {
     protected var variables = PmVariableScope()
     protected val valueStack = mutableListOf<PmValue>()
+
+    private val customBuiltinFunctions = mutableMapOf<String, PmBuiltinFunction>()
+
+    fun addBuiltinFunction(name: String, function: PmBuiltinFunction) {
+        customBuiltinFunctions[name] = function
+    }
 
     @Throws(PmRuntimeError::class)
     protected open fun executeInstructions() {
@@ -113,21 +119,9 @@ abstract class PmProcessor(
         }
     }
 
-    protected open fun invokeBuiltinFunction(name: String) {
-        when (name) {
-            "print" -> PmBuiltinFunctions.PRINT.invoke(valueStack) { parameters -> println(parameters[0]); PmNone() }
-            "rgb" -> PmBuiltinFunctions.RGB.invoke(valueStack) { parameters ->
-                PmColor(parameters[0].floatValue(), parameters[1].floatValue(), parameters[2].floatValue())
-            }
-            "int" -> PmBuiltinFunctions.INT.invoke(valueStack) { parameters -> PmInt(parameters[0].floatValue().toInt()) }
-            "float" -> PmBuiltinFunctions.FLOAT.invoke(valueStack) { parameters -> PmFloat(parameters[0].intValue().toFloat()) }
-            "sin" -> PmBuiltinFunctions.SIN.invoke(valueStack) { parameters -> PmFloat(sin(toRadians(parameters[0].floatValue()))) }
-            "cos" -> PmBuiltinFunctions.COS.invoke(valueStack) { parameters -> PmFloat(cos(toRadians(parameters[0].floatValue()))) }
-            "add" -> PmBuiltinFunctions.ADD_TO_LIST.invoke(valueStack) { parameters ->
-                parameters[0].castTo<PmList>().elements.add(parameters[1])
-                parameters[0]
-            }
-            else -> throw PmRuntimeError("Unknown built-in function $name")
-        }
+    protected fun invokeBuiltinFunction(name: String) {
+        val builtinFunction = PmBuiltinFunctions.MAP[name] ?: customBuiltinFunctions[name]
+            ?: throw PmRuntimeError("Unknown built-in function $name")
+        builtinFunction.invoke(valueStack)
     }
 }

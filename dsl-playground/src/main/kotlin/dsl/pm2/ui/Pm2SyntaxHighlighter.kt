@@ -15,6 +15,7 @@ import org.antlr.v4.runtime.dfa.DFA
 import org.antlr.v4.runtime.tree.ParseTree
 import org.antlr.v4.runtime.tree.ParseTreeWalker
 import org.antlr.v4.runtime.tree.TerminalNode
+import java.lang.RuntimeException
 import java.util.*
 import kotlin.math.max
 
@@ -37,7 +38,11 @@ private class Pm2SyntaxHighlighter(
         parser.addErrorListener(this)
 
         val context = parser.start()
-        ParseTreeWalker.DEFAULT.walk(this, context)
+        try {
+            ParseTreeWalker.DEFAULT.walk(this, context)
+        } catch (unexpected: RuntimeException) {
+            unexpected.printStackTrace()
+        }
     }
 
     private fun insert(color: Color, lineNumber: Int, charIndex: Int, length: Int) {
@@ -121,8 +126,10 @@ private class Pm2SyntaxHighlighter(
         insertChildKeyword(ctx.children, 0, "static", colorTheme.error)
 
         val identifiers = ctx.IDENTIFIER()
-        insertTypeName(identifiers[0])
-        for (index in 1 until identifiers.size step 2) insertTypeName(identifiers[index])
+        if (identifiers.isNotEmpty()) {
+            insertTypeName(identifiers[0])
+            for (index in 1 until identifiers.size step 2) insertTypeName(identifiers[index])
+        }
     }
 
     override fun exitForLoopHeader(ctx: ProcModel2Parser.ForLoopHeaderContext?) {
@@ -131,8 +138,10 @@ private class Pm2SyntaxHighlighter(
 
     override fun exitFunctionDeclaration(ctx: ProcModel2Parser.FunctionDeclarationContext?) {
         val identifiers = ctx!!.IDENTIFIER()
-        insert(colorTheme.functionDeclaration, identifiers[1].symbol, identifiers[1].symbol)
-        for (index in 0 until identifiers.size step 2) insertTypeName(identifiers[index])
+        if (identifiers.isNotEmpty()) {
+            insert(colorTheme.functionDeclaration, identifiers[1].symbol, identifiers[1].symbol)
+            for (index in 0 until identifiers.size step 2) insertTypeName(identifiers[index])
+        }
     }
 
     override fun exitFunctionInvocation(ctx: ProcModel2Parser.FunctionInvocationContext?) {

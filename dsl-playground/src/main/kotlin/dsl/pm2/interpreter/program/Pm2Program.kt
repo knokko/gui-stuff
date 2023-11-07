@@ -9,6 +9,7 @@ import dsl.pm2.interpreter.value.Pm2Value
 import org.antlr.v4.runtime.*
 import org.antlr.v4.runtime.misc.ParseCancellationException
 import org.antlr.v4.runtime.tree.ParseTreeWalker
+import java.lang.RuntimeException
 import kotlin.jvm.Throws
 
 class Pm2Program(
@@ -72,6 +73,10 @@ class Pm2Program(
             // params, kneeAngle
             println("dynamic child parameter blocks are ${converter.program.dynamicChildParameterBlocks.size}")
             println()
+
+            try {
+                println("children are ${converter.program.childProgramTable}")
+            } catch (nope: RuntimeException) {}
 
             return converter.program
         }

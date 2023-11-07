@@ -82,7 +82,7 @@ internal class Pm2Converter(private val importer: Pm2Importer, private val isChi
             }
             val instructionDump = PrintWriter(File("instructions.txt"))
             for ((index, instruction) in instructions.withIndex()) {
-                instructionDump.println(String.format("%d %s", index, instruction))
+                instructionDump.println(String.format("%s, // index %d", instruction, index))
             }
             instructionDump.println("---- DYNAMIC DECLARATIONS ----")
             for ((blockIndex, instructions) in this.dynamicDeclarations.withIndex()) {

@@ -48,9 +48,37 @@ class Pm2Instruction(
     }
 
     override fun toString(): String {
-        var result = type.toString()
-        if (value != null) result = "$result $value"
-        if (name != null) result = "$result $name"
-        return result
+        val name = "\"${this.name}\""
+        return when (type) {
+            Pm2InstructionType.PushValue -> "pushValue($value, $lineNumber)"
+            Pm2InstructionType.PushVariable -> "pushVariable($name, $lineNumber)"
+            Pm2InstructionType.PushProperty -> "pushProperty($name, $lineNumber)"
+            Pm2InstructionType.ReadListOrMap -> "readListOrMap($lineNumber)"
+            Pm2InstructionType.Divide -> "divide($lineNumber)"
+            Pm2InstructionType.Multiply -> "multiply($lineNumber)"
+            Pm2InstructionType.Add -> "add($lineNumber)"
+            Pm2InstructionType.Subtract -> "subtract($lineNumber)"
+            Pm2InstructionType.SmallerThan -> "smallerThan($lineNumber)"
+            Pm2InstructionType.SmallerOrEqual -> "smallerOrEqual($lineNumber)"
+            Pm2InstructionType.Duplicate -> "duplicate($lineNumber)"
+            Pm2InstructionType.Swap -> "swap($lineNumber)"
+            Pm2InstructionType.Delete -> "delete($lineNumber)"
+            Pm2InstructionType.DeclareVariable -> "declareVariable($name, $variableType, $lineNumber)"
+            Pm2InstructionType.ReassignVariable -> "reassignVariable($name, $lineNumber)"
+            Pm2InstructionType.SetProperty -> "setProperty($name, $lineNumber)"
+            Pm2InstructionType.UpdateListOrMap -> "updateListOrMap($lineNumber)"
+            Pm2InstructionType.Jump -> "jump($lineNumber)"
+            Pm2InstructionType.InvokeBuiltinFunction -> "invokeBuiltinFunction($name, $lineNumber)"
+            Pm2InstructionType.TransferVariable -> "transferVariable($name, $variableType, $lineNumber)"
+            Pm2InstructionType.CreateDynamicMatrix -> "createDynamicMatrix($lineNumber)"
+            Pm2InstructionType.CreateChildModel -> "createChildModel($name, $lineNumber)"
+            Pm2InstructionType.ExitProgram -> "exitProgram($lineNumber)"
+            Pm2InstructionType.PushScope -> "pushScope($lineNumber)"
+            Pm2InstructionType.PopScope -> "popScope($lineNumber)"
+        }
+//        var result = type.toString()
+//        if (value != null) result = "$result $value"
+//        if (name != null) result = "$result $name"
+//        return result
     }
 }

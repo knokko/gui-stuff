@@ -31,6 +31,26 @@ internal class Pm2VertexProcessor(
         if (valueStack.isNotEmpty()) throw IllegalStateException("Value stack should be empty")
         if (variables.hasScope()) throw IllegalStateException("All scopes should have been popped")
 
+        println("matrices are:")
+        for (matrix in dynamicMatrices) {
+            println("-----------------")
+            if (matrix == null) {
+                println("null")
+                continue
+            }
+            println("parent ${matrix.parentIndex}")
+            println("dynamic parameters ${matrix.dynamicParameterTypes}")
+            if (matrix.dynamicMatrixPropagationInstructions != null) {
+                println("propagation:")
+                for (instruction in matrix.dynamicMatrixPropagationInstructions) println(instruction)
+            }
+            println("transfer ${matrix.transferredVariables}")
+            println("instructions:")
+            for (instruction in matrix.instructions) println(instruction)
+        }
+
+        println("vertices are:")
+        for (vertex in vertices) println(vertex)
         return Pm2Model(vertices.map { it.toVertex() }, dynamicMatrices, program.dynamicParameters)
     }
 

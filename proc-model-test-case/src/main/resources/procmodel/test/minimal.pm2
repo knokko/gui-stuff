@@ -1,0 +1,34 @@
+import model ./minimal/nested;
+import model ./minimal/triangle;
+
+static parameter color ownColor;
+
+dynamic parameter float passDistance;
+
+Map triangleParameters;
+triangleParameters["color"] = ownColor;
+
+matrix bigMatrix = dynamic Matrix {
+	Matrix bigMatrix;
+	scale(bigMatrix, 4.0, 4.0);
+	outputValue(bigMatrix);
+};
+
+child model triangle(bigMatrix, triangleParameters);
+
+Map nestedParameters;
+nestedParameters["offsetX"] = 0.2;
+nestedParameters["offsetY"] = -0.3;
+nestedParameters["color1"] = rgb(1.0, 0.0, 0.0);
+nestedParameters["color2"] = rgb(0.0, 1.0, 0.0);
+
+matrix smallMatrix = dynamic Matrix {
+	Matrix smallMatrix;
+	scale(smallMatrix, 0.4, 0.4);
+	outputValue(smallMatrix);
+};
+child model nested(smallMatrix, nestedParameters) {
+	Map parameters;
+	parameters["distance"] = passDistance;
+	outputValue(parameters);
+};

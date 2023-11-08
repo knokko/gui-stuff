@@ -32,7 +32,7 @@ importAlias: 'as' IDENTIFIER;
 
 importValue: 'import' IDENTIFIER 'value' importPath importAlias? ';';
 
-dynamicBlock: '{' innerStatement* expression '}';
+dynamicBlock: '{' innerStatement* '}';
 
 childModelBlock : dynamicBlock;
 

@@ -9,7 +9,7 @@ import procmodel.processor.PmValueProcessor
 class SimpleCompilerTests {
 
     private fun valueTest(sourceCode: String, expected: PmValue) {
-        val program = PmCompiler.compile(sourceCode, PmImporter.dummy(), mapOf(Pair("outputValue", 1)))
+        val program = PmCompiler.compile(sourceCode, PmImporter.dummy(), emptyMap(), emptyList())
         val processor = PmValueProcessor(program.body)
         processor.execute()
         assertEquals(expected, processor.result)

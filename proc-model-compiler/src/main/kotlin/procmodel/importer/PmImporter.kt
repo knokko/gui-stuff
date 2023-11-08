@@ -5,6 +5,7 @@ import procmodel.compiler.PmCompiler
 import procmodel.exceptions.PmCompileError
 import procmodel.exceptions.PmRuntimeError
 import procmodel.lang.types.PmInt
+import procmodel.lang.types.PmType
 import procmodel.lang.types.PmValue
 import procmodel.processor.PmValueProcessor
 
@@ -15,7 +16,12 @@ class PmImporter<VertexValue : PmValue>(
 ) {
 
     @Throws(PmCompileError::class, PmRuntimeError::class)
-    fun importValue(path: String, isRelative: Boolean, extraFunctions: Map<String, Int>): PmValue {
+    fun importValue(
+        path: String,
+        isRelative: Boolean,
+        extraFunctions: Map<String, Int>,
+        extraTypes: List<PmType>
+    ): PmValue {
         val fullPath = (if (isRelative) prefix + path else path) + ".pv2"
         val cachedValue = cache.values[fullPath]
 
@@ -27,7 +33,7 @@ class PmImporter<VertexValue : PmValue>(
         val valuePrefix = if (lastSlash == -1) "" else fullPath.substring(0 until lastSlash)
         val valueImporter = PmImporter(cache, valuePrefix, parseVertex)
 
-        val valueProgram = PmCompiler.compile(sourceCode, valueImporter, extraFunctions)
+        val valueProgram = PmCompiler.compile(sourceCode, valueImporter, extraFunctions, extraTypes)
 
         val processor = PmValueProcessor(valueProgram.body)
         processor.execute()
@@ -36,7 +42,12 @@ class PmImporter<VertexValue : PmValue>(
     }
 
     @Throws(PmCompileError::class)
-    fun importModel(path: String, isRelative: Boolean, extraFunctions: Map<String, Int>): String {
+    fun importModel(
+        path: String,
+        isRelative: Boolean,
+        extraFunctions: Map<String, Int>,
+        extraTypes: List<PmType>
+    ): String {
         val fullPath = (if (isRelative) prefix + path else path) + ".pm2"
         val cachedId = cache.models[fullPath]
 
@@ -52,7 +63,7 @@ class PmImporter<VertexValue : PmValue>(
         // IMPORTANT: To avoid endless recursion when two child programs import each other,
         // the compilations must happen AFTER the child program is stored in the cache
         cache.models[fullPath] = childProgram
-        childProgram.program = PmCompiler.compile(sourceCode, childImporter, extraFunctions, true)
+        childProgram.program = PmCompiler.compile(sourceCode, childImporter, extraFunctions, extraTypes, true)
 
         return childProgram.id
     }

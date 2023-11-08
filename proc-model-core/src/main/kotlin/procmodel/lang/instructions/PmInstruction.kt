@@ -27,6 +27,9 @@ class PmInstruction private constructor(
      */
     val name: String? = null
 ) {
+    override fun equals(other: Any?) = other is PmInstruction &&
+            other.type == this.type && other.lineNumber == this.lineNumber && other.value == this.value &&
+            other.variableType == this.variableType && other.name == this.name
 
     override fun toString(): String {
         val name = "\"${this.name}\""
@@ -57,6 +60,15 @@ class PmInstruction private constructor(
             PmInstructionType.PushScope -> "pushScope($lineNumber)"
             PmInstructionType.PopScope -> "popScope($lineNumber)"
         }
+    }
+
+    override fun hashCode(): Int {
+        var result = type.hashCode()
+        result = 31 * result + lineNumber
+        result = 31 * result + (value?.hashCode() ?: 0)
+        result = 31 * result + (variableType?.hashCode() ?: 0)
+        result = 31 * result + (name?.hashCode() ?: 0)
+        return result
     }
 
     companion object {

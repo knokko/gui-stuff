@@ -149,6 +149,8 @@ project(':proc-model-core') {
 project(':proc-model-processor') {
     dependencies {
         implementation project(':proc-model-core')
+
+        testImplementation project(':proc-model-test-case')
     }
 }
 
@@ -157,6 +159,15 @@ project(':proc-model-compiler') {
         implementation 'org.antlr:antlr4:4.13.0'
         implementation project(':proc-model-core')
         implementation project(':proc-model-processor')
+        implementation project(':graviks2d') // TODO Move graviks2d.Color to separate module and depend on that instead
+
+        testImplementation project(':proc-model-test-case')
+    }
+}
+
+project(':proc-model-test-case') {
+    dependencies {
+        implementation project(':proc-model-core')
         implementation project(':graviks2d') // TODO Move graviks2d.Color to separate module and depend on that instead
     }
 }

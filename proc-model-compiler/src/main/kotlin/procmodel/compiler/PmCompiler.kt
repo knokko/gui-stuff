@@ -24,6 +24,7 @@ import java.lang.RuntimeException
 class PmCompiler<VertexValue : PmValue>(
     private val importer: PmImporter<VertexValue>,
     private val extraFunctions: Map<String, Int>,
+    private val extraTypes: List<PmType>,
     private val isChild: Boolean
 ) : ProcModelBaseListener() {
 
@@ -44,6 +45,13 @@ class PmCompiler<VertexValue : PmValue>(
 
     lateinit var program: PmProgram
 
+    private fun getParameterCountOfBuiltinFunction(name: String): Int? {
+        if (name == "outputValue") return 1
+        val builtinFunction = PmBuiltinFunctions.MAP[name]
+        if (builtinFunction != null) return builtinFunction.parameterTypes.size
+        return extraFunctions[name]
+    }
+
     override fun visitErrorNode(node: ErrorNode?) {
         println("Encountered error $node")
     }
@@ -54,6 +62,9 @@ class PmCompiler<VertexValue : PmValue>(
         for (type in PmBuiltinTypes.ALL) {
             // I'm planning to get rid of ANY in the future
             if (type != PmBuiltinTypes.ANY) types.defineType(type.name, type)
+        }
+        for (type in extraTypes) {
+            types.defineType(type.name, type)
         }
 
         functions.pushScope()
@@ -252,35 +263,23 @@ class PmCompiler<VertexValue : PmValue>(
 
     override fun enterFunctionInvocation(ctx: ProcModelParser.FunctionInvocationContext?) {
         val functionName = ctx!!.IDENTIFIER().text
-        val builtinFunction = PmBuiltinFunctions.MAP[functionName]
-        val extraFunction = extraFunctions[functionName]
-        if (builtinFunction == null && extraFunction == null) {
+        val builtinParameterCount = getParameterCountOfBuiltinFunction(functionName)
+        if (builtinParameterCount == null) {
 
             // I need to remember the return address via this instruction, but I don't know its value, yet
             // I will supply it during exitFunctionInvocation()
             functionIndexStack.add(instructions.size)
-            println("the index is ${instructions.size}")
             instructions.add(PmInstruction.pushValue(PmInt(-1), ctx.start.line))
         }
     }
 
     override fun exitFunctionInvocation(ctx: ProcModelParser.FunctionInvocationContext?) {
         val functionName = ctx!!.IDENTIFIER().text
-        val builtinFunction = PmBuiltinFunctions.MAP[functionName]
-        val extraFunction = extraFunctions[functionName]
-        if (builtinFunction != null) {
-            if (ctx.expression().size != builtinFunction.parameterTypes.size) {
+        val builtinParameterCount = getParameterCountOfBuiltinFunction(functionName)
+        if (builtinParameterCount != null) {
+            if (ctx.expression().size != builtinParameterCount) {
                 throw PmCompileError(
-                    "Built-in function $functionName requires ${builtinFunction.parameterTypes.size} parameters, but got ${ctx.expression().size}",
-                    ctx.start.line, ctx.start.charPositionInLine
-                )
-            }
-
-            instructions.add(PmInstruction.invokeBuiltinFunction(functionName, ctx.start.line))
-        } else if (extraFunction != null) {
-            if (ctx.expression().size != extraFunction) {
-                throw PmCompileError(
-                    "Extra function $functionName requires $extraFunction parameters, but got ${ctx.expression().size}",
+                    "Built-in function $functionName requires $builtinParameterCount parameters, but got ${ctx.expression().size}",
                     ctx.start.line, ctx.start.charPositionInLine
                 )
             }
@@ -309,7 +308,7 @@ class PmCompiler<VertexValue : PmValue>(
     override fun exitImportValue(ctx: ProcModelParser.ImportValueContext?) {
         val isRelative = ctx!!.importPath().relativeImportPrefix() != null
         val relativePath = "/" + ctx.importPath().relativeImportPath().text
-        val importedValue = importer.importValue(relativePath, isRelative, extraFunctions)
+        val importedValue = importer.importValue(relativePath, isRelative, extraFunctions, extraTypes)
         val typeName = ctx.IDENTIFIER().text
         val name = ctx.importAlias()?.IDENTIFIER()?.text ?: ctx.importPath().relativeImportPath().IDENTIFIER().last().text
 
@@ -325,7 +324,7 @@ class PmCompiler<VertexValue : PmValue>(
         val name = ctx.importAlias()?.IDENTIFIER()?.text ?: ctx.importPath().relativeImportPath().IDENTIFIER().last().text
         if (importedModelIDs.containsKey(name)) throw PmCompileError("Duplicate import $name")
 
-        importedModelIDs[name] = importer.importModel(relativePath, isRelative, extraFunctions)
+        importedModelIDs[name] = importer.importModel(relativePath, isRelative, extraFunctions, extraTypes)
     }
 
     override fun exitImportTriangles(ctx: ProcModelParser.ImportTrianglesContext?) {
@@ -363,6 +362,8 @@ class PmCompiler<VertexValue : PmValue>(
             val newBlock = mutableListOf<PmInstruction>()
             this.dynamicChildInstructions.add(newBlock)
             newBlock.add(PmInstruction.pushValue(PmMap(), ctx!!.stop.line))
+            newBlock.add(PmInstruction.invokeBuiltinFunction("outputValue", ctx.stop.line))
+            newBlock.add(PmInstruction.delete(ctx.stop.line))
             newBlock.add(PmInstruction.exitProgram(ctx.stop.line))
         }
 
@@ -495,9 +496,10 @@ class PmCompiler<VertexValue : PmValue>(
             sourceCode: String,
             importer: PmImporter<VertexValue>,
             extraFunctions: Map<String, Int>,
+            extraTypes: List<PmType>,
             isChild: Boolean = false
         ): PmProgram {
-            val compiler = PmCompiler(importer, extraFunctions, isChild)
+            val compiler = PmCompiler(importer, extraFunctions, extraTypes, isChild)
 
             val lexer = ProcModelLexer(CharStreams.fromString(sourceCode))
             val parser = ProcModelParser(CommonTokenStream(lexer))

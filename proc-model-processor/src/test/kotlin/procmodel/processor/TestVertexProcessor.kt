@@ -67,7 +67,7 @@ class TestVertexProcessor {
         val downMatrix = model.matrices[3]!!
         assertEquals(2, downMatrix.parentIndex)
         assertEquals(mapOf(Pair("distance", PmBuiltinTypes.FLOAT)), downMatrix.dynamicParameterTypes)
-        assertEquals(PmTestCase.childInvocations[1].dynamicParameters.instructions, downMatrix.propagator!!.instructions)
+        assertEquals(PmTestCase.childInvocations[1].instructions, downMatrix.propagator!!.instructions)
         assertEquals(mapOf(
             Pair("offsetX", Pair(PmBuiltinTypes.FLOAT, PmFloat(0.2f))),
             Pair("offsetY", Pair(PmBuiltinTypes.FLOAT, PmFloat(-0.3f)))
@@ -77,7 +77,7 @@ class TestVertexProcessor {
         val upMatrix = model.matrices[4]!!
         assertEquals(2, upMatrix.parentIndex)
         assertEquals(mapOf(Pair("distance", PmBuiltinTypes.FLOAT)), upMatrix.dynamicParameterTypes)
-        assertEquals(PmTestCase.childInvocations[1].dynamicParameters.instructions, upMatrix.propagator!!.instructions)
+        assertEquals(PmTestCase.childInvocations[1].instructions, upMatrix.propagator!!.instructions)
         assertEquals(mapOf(
             Pair("offsetX", Pair(PmBuiltinTypes.FLOAT, PmFloat(0.2f))),
             Pair("offsetY", Pair(PmBuiltinTypes.FLOAT, PmFloat(-0.3f)))

@@ -104,7 +104,7 @@ class PmCompiler<VertexValue : PmValue>(
                     it.instructions.toMutableList()
                 })
                 this.dynamicChildInstructions.addAll(childProgram.program.childInvocations.map {
-                    it.dynamicParameters.instructions.toMutableList()
+                    it.instructions.toMutableList()
                 })
             }
             val instructionDump = PrintWriter(File("instructions.txt"))
@@ -132,7 +132,7 @@ class PmCompiler<VertexValue : PmValue>(
         program = PmProgram(
             body = PmProgramBody(instructions.toList()),
             dynamicMatrices = dynamicDeclarations.map { PmDynamicMatrixConstructor(it.toList()) },
-            childInvocations = dynamicChildInstructions.map { PmChildProgramInvocation(PmParameterPropagator(it.toList())) },
+            childInvocations = dynamicChildInstructions.map { PmParameterPropagator(it.toList()) },
             children = children.toMap(),
             staticParameters = staticParameters.toMap(),
             dynamicParameters = dynamicParameters.toMap()

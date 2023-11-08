@@ -17,9 +17,10 @@ class PmProgram(
     val dynamicMatrices: List<PmDynamicMatrixConstructor>,
 
     /**
-     * The element with index N contains information about invoking child program N
+     * The element with index N contains the instructions to propagate our dynamic parameters to the
+     * dynamic parameters of child program N
      */
-    val childInvocations: List<PmChildProgramInvocation>,
+    val childInvocations: List<PmParameterPropagator>,
 
     /**
      * The imported child programs that are embedded in this program. The id (currently just the import path) of the

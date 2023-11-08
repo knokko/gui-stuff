@@ -42,8 +42,7 @@ class ComplexCompilerTest {
         }
         for ((index, expected) in PmTestCase.program.childInvocations.withIndex()) {
             val actual = program.childInvocations[index]
-            // TODO Remove the unneeded .dynamicParameters.instructions chaining
-            assertArrayEquals(expected.dynamicParameters.instructions.toTypedArray(), actual.dynamicParameters.instructions.toTypedArray())
+            assertArrayEquals(expected.instructions.toTypedArray(), actual.instructions.toTypedArray())
         }
         assertEquals(PmTestCase.program.children, program.children)
         assertEquals(PmTestCase.program.staticParameters, program.staticParameters)

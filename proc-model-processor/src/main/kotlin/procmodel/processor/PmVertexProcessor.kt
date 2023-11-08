@@ -143,7 +143,7 @@ class PmVertexProcessor<VertexValue : PmValue, Vertex>(
 
         dynamicMatrices.add(PmDynamicMatrix(
             program.dynamicMatrices[dynamicIndex],
-            childInvocation?.dynamicParameters,
+            childInvocation,
             dynamicParameterTypes,
             transferVariables
         ))

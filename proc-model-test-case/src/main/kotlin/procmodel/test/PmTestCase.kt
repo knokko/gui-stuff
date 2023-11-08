@@ -188,14 +188,13 @@ object PmTestCase {
         ))
     )
     val childInvocations = listOf(
-        PmChildProgramInvocation(PmParameterPropagator(listOf(
+        PmParameterPropagator(listOf(
             PmInstruction.pushValue(PmMap(), 17),
             PmInstruction.invokeBuiltinFunction("outputValue", 17),
             PmInstruction.delete(17),
             PmInstruction.exitProgram(17)
-        ))
-        ),
-        PmChildProgramInvocation(PmParameterPropagator(listOf(
+        )),
+        PmParameterPropagator(listOf(
             PmInstruction.pushValue(PmMap(), 31),
             PmInstruction.declareVariable("parameters", PmBuiltinTypes.MAP, 31),
             PmInstruction.pushVariable("parameters", 32),
@@ -206,22 +205,19 @@ object PmTestCase {
             PmInstruction.invokeBuiltinFunction("outputValue", 33),
             PmInstruction.delete(33),
             PmInstruction.exitProgram(34)
-        ))
-        ),
-        PmChildProgramInvocation(PmParameterPropagator(listOf(
+        )),
+        PmParameterPropagator(listOf(
             PmInstruction.pushValue(PmMap(), 26),
             PmInstruction.invokeBuiltinFunction("outputValue", 26),
             PmInstruction.delete(26),
             PmInstruction.exitProgram(26)
-        ))
-        ),
-        PmChildProgramInvocation(PmParameterPropagator(listOf(
+        )),
+        PmParameterPropagator(listOf(
             PmInstruction.pushValue(PmMap(), 27),
             PmInstruction.invokeBuiltinFunction("outputValue", 27),
             PmInstruction.delete(27),
             PmInstruction.exitProgram(27)
         ))
-        )
     )
     private val children = mapOf(
         Pair("/minimal/triangle.pm2", PmChildProgram(

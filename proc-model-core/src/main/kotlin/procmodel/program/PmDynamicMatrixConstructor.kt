@@ -10,5 +10,4 @@ import procmodel.lang.instructions.PmInstruction
  *
  * The instructions use the built-in `outputValue` function to mark the result.
  */
-class PmDynamicMatrixConstructor(instructions: List<PmInstruction>) : PmProgramBody(instructions) {
-}
+class PmDynamicMatrixConstructor(instructions: List<PmInstruction>) : PmProgramBody(instructions)

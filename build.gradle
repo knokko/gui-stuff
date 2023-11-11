@@ -171,3 +171,51 @@ project(':proc-model-test-case') {
         implementation project(':graviks2d') // TODO Move graviks2d.Color to separate module and depend on that instead
     }
 }
+
+project(':proc-model-renderer') {
+    dependencies {
+        implementation project(':proc-model-core')
+        implementation project(':proc-model-processor')
+        implementation project(':graviks2d') // TODO Move graviks2d.Color to separate module and depend on that instead
+
+        implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
+        implementation "org.lwjgl:lwjgl"
+        implementation "org.lwjgl:lwjgl-vulkan"
+        implementation "org.lwjgl:lwjgl-vma"
+        implementation "com.github.knokko:vk-boiler:$boilerVersion"
+    }
+}
+
+project(':proc-model-2d') {
+    dependencies {
+        compileOnly project(':proc-model-core')
+        compileOnly project(':proc-model-processor')
+        compileOnly project(':proc-model-compiler')
+        compileOnly project(':proc-model-renderer')
+        compileOnly project(':graviks2d') // TODO Move graviks2d.Color to separate module and depend on that instead
+
+        implementation platform("org.lwjgl:lwjgl-bom:$lwjglVersion")
+        implementation "org.lwjgl:lwjgl"
+        implementation "org.lwjgl:lwjgl-vulkan"
+        implementation "org.lwjgl:lwjgl-vma"
+        implementation "com.github.knokko:vk-boiler:$boilerVersion"
+    }
+}
+
+project(':proc-model-playground') {
+    dependencies {
+        implementation project(':graviks2d')
+        implementation project(':proc-model-compiler')
+        implementation project(':proc-model-processor')
+        implementation project(':proc-model-renderer')
+        implementation project(':proc-model-2d')
+
+        implementation 'com.github.knokko:sample-profiler:v1.0.0'
+        implementation "org.lwjgl:lwjgl-glfw"
+
+        runtimeOnly "org.lwjgl:lwjgl::$lwjglNatives"
+        runtimeOnly "org.lwjgl:lwjgl-vma::$lwjglNatives"
+        if (lwjglNatives == "natives-macos") runtimeOnly "org.lwjgl:lwjgl-vulkan::$lwjglNatives"
+        runtimeOnly "org.lwjgl:lwjgl-glfw::$lwjglNatives"
+    }
+}

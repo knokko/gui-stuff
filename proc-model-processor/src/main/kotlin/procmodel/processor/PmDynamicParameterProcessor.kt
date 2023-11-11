@@ -8,7 +8,7 @@ import procmodel.lang.types.PmType
 import procmodel.lang.types.PmValue
 import procmodel.program.PmProgramBody
 
-internal class PmDynamicParameterProcessor(
+class PmDynamicParameterProcessor(
     body: PmProgramBody,
     private val dynamicParentParameterValues: Map<String, PmValue>,
     private val dynamicParentParameterTypes: Map<String, PmType>

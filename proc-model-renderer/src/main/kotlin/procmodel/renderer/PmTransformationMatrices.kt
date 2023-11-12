@@ -1,16 +1,14 @@
 package procmodel.renderer
 
 import com.github.knokko.boiler.buffer.MappedVmaBuffer
-import com.github.knokko.boiler.exceptions.VulkanFailureException.assertVkSuccess
 import com.github.knokko.boiler.instance.BoilerInstance
-import org.lwjgl.system.MemoryStack
 import org.lwjgl.system.MemoryStack.stackPush
 import org.lwjgl.system.MemoryUtil
 import org.lwjgl.util.vma.Vma.vmaDestroyBuffer
-import org.lwjgl.vulkan.VK10
 import org.lwjgl.vulkan.VK10.*
 import org.lwjgl.vulkan.VkWriteDescriptorSet
 import procmodel.exceptions.PmRuntimeError
+import procmodel.lang.functions.PmBuiltinFunction
 import procmodel.lang.types.PmMap
 import procmodel.lang.types.PmString
 import procmodel.lang.types.PmType
@@ -19,23 +17,25 @@ import procmodel.processor.PmDynamicParameterProcessor
 import procmodel.processor.PmMatrixProcessor
 import procmodel.program.PmProgramBody
 import procmodel.renderer.config.PmMatrixInfo
+import procmodel.renderer.config.PmPipelineInfo
 
-// TODO Wait... this doesn't support multithreading...
 class PmTransformationMatrices<Matrix> internal constructor(
     private val boiler: BoilerInstance,
     private val matrixInfo: PmMatrixInfo<Matrix>,
-    createDescriptorPool: (amount: Int) -> Long,
-    descriptorSetLayout: Long
+    private val pipelineInfo: PmPipelineInfo<Matrix>,
+    private val builtinFunctions: Map<String, PmBuiltinFunction>,
 ) {
     // TODO Reuse some larger pool
-    private val descriptorPool = createDescriptorPool(1)
+    private val descriptorPool = pipelineInfo.createDescriptorPool(1)
     val descriptorSet: Long
     private var matrixBuffer: MappedVmaBuffer? = null
 
     init {
         stackPush().use { stack ->
             descriptorSet = boiler.descriptors.allocate(
-                stack, 1, descriptorPool, "PmTransformationMatrices", descriptorSetLayout
+                stack, 1, descriptorPool,
+                "PmTransformationMatrices",
+                pipelineInfo.descriptorSetLayout
             )[0]
         }
     }
@@ -82,12 +82,14 @@ class PmTransformationMatrices<Matrix> internal constructor(
                     val (parentMatrix, dynamicParentParameterValues, dynamicParentParameterTypes) = matrices[matrix.parentIndex]
 
                     val childParameterValues = if (matrix.propagator != null) {
-                        // TODO Hm... define built-ins for this processor
                         val parameterProcessor = PmDynamicParameterProcessor(
                             PmProgramBody(matrix.propagator!!.instructions),
                             dynamicParentParameterValues,
                             dynamicParentParameterTypes
                         )
+                        for ((functionName, function) in builtinFunctions) {
+                            parameterProcessor.addBuiltinFunction(functionName, function)
+                        }
                         parameterProcessor.execute()
 
                         val pmResult = parameterProcessor.result as PmMap
@@ -101,8 +103,10 @@ class PmTransformationMatrices<Matrix> internal constructor(
                         dynamicParentParameterValues
                     }
 
-                    // TODO And define built-ins for this processor
                     val childMatrixProcessor = PmMatrixProcessor(matrix, childParameterValues)
+                    for ((functionName, function) in builtinFunctions) {
+                        childMatrixProcessor.addBuiltinFunction(functionName, function)
+                    }
                     childMatrixProcessor.execute()
                     val relativeMatrix = matrixInfo.takeResult(childMatrixProcessor.result!!)
 

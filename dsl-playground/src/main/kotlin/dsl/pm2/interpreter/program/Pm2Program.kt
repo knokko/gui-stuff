@@ -67,17 +67,6 @@ class Pm2Program(
                 }
             }
 
-            // footMatrix, footAngle
-            println("dynamic blocks are ${converter.program.dynamicBlocks.size}")
-
-            // params, kneeAngle
-            println("dynamic child parameter blocks are ${converter.program.dynamicChildParameterBlocks.size}")
-            println()
-
-            try {
-                println("children are ${converter.program.childProgramTable}")
-            } catch (nope: RuntimeException) {}
-
             return converter.program
         }
     }

@@ -10,10 +10,11 @@ import org.lwjgl.vulkan.VkDescriptorPoolSize
 import org.lwjgl.vulkan.VkDescriptorSetLayoutBinding
 import org.lwjgl.vulkan.VkPushConstantRange
 import procmodel.renderer.config.PmMatrixInfo
+import procmodel.renderer.config.PmModelInfo
 import procmodel.renderer.config.PmPipelineInfo
 import procmodel.renderer.config.PmVertexInfo
 
-fun createPipelineInfo2d(boiler: BoilerInstance): PmPipelineInfo<Pm2dVertex, Matrix3x2f> {
+fun createModelInfo2d(boiler: BoilerInstance): PmModelInfo<Pm2dVertex, Matrix3x2f> {
     val (pipelineLayout, descriptorSetLayout) = createLayout(boiler)
     val vertexSize = 24
 
@@ -44,9 +45,7 @@ fun createPipelineInfo2d(boiler: BoilerInstance): PmPipelineInfo<Pm2dVertex, Mat
         }
     )
 
-    return PmPipelineInfo(
-        vertices = vertexInfo,
-        matrices = matrixInfo,
+    val pipelineInfo = PmPipelineInfo<Matrix3x2f>(
         pipelineLayout = pipelineLayout,
         createGraphicsPipeline = { pipelineInfo -> createGraphicsPipeline(
             boiler, pipelineInfo, pipelineLayout, vertexSize
@@ -87,6 +86,13 @@ fun createPipelineInfo2d(boiler: BoilerInstance): PmPipelineInfo<Pm2dVertex, Mat
                 pushBuffer
             )
         }
+    )
+
+    return PmModelInfo(
+        vertices = vertexInfo,
+        matrices = matrixInfo,
+        pipeline = pipelineInfo,
+        builtinFunctions = Pm2dBuiltinFunctions.all,
     )
 }
 

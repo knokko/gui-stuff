@@ -8,7 +8,7 @@ import procmodel.lang.types.PmValue
 
 class Pm2dVertexValue : PmValue() {
 
-    private lateinit var position: Pm2PositionValue
+    private lateinit var position: Pm2dPositionValue
     private var color = PmColor(0f, 0f, 0f)
     private var matrix = PmMatrixIndex(0)
 

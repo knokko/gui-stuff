@@ -521,17 +521,6 @@ class PmCompiler<VertexValue : PmValue>(
                 }
             }
 
-            // footMatrix, footAngle
-            println("dynamic blocks are ${compiler.program.dynamicMatrices.size}")
-
-            // params, kneeAngle
-            println("dynamic child parameter blocks are ${compiler.program.childInvocations.size}")
-            println()
-
-            try {
-                println("children are ${compiler.program.children}")
-            } catch (nope: RuntimeException) {}
-
             return compiler.program
         }
     }

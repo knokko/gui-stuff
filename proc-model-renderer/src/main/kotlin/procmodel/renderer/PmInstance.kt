@@ -1,27 +1,27 @@
 package procmodel.renderer
 
 import com.github.knokko.boiler.instance.BoilerInstance
-import procmodel.renderer.config.PmPipelineInfo
+import procmodel.renderer.config.PmModelInfo
 
 /**
  * The root of the renderer system.
  */
 class PmInstance<Vertex, Matrix>(
     private val boiler: BoilerInstance,
-    private val pipelineInfo: PmPipelineInfo<Vertex, Matrix>
+    private val modelInfo: PmModelInfo<Vertex, Matrix>
 ) {
-    val meshes = PmMeshes(boiler, pipelineInfo.vertices)
-    val commands = PmCommands(boiler, pipelineInfo)
-    val transformationMatrices = PmTransformationMatrices(
-        boiler, pipelineInfo.matrices,
-        pipelineInfo.createDescriptorPool,
-        pipelineInfo.descriptorSetLayout
+    val meshes = PmMeshes(boiler, modelInfo.vertices)
+    val commands = PmCommands(boiler, modelInfo.pipeline)
+
+    fun createTransformationMatrices() = PmTransformationMatrices(
+        boiler, modelInfo.matrices,
+        modelInfo.pipeline,
+        modelInfo.builtinFunctions
     )
 
     fun destroy() {
-        transformationMatrices.destroy()
         meshes.destroy()
-        pipelineInfo.destroy(boiler.vkDevice())
+        modelInfo.destroy(boiler.vkDevice())
         commands.destroy()
     }
 }

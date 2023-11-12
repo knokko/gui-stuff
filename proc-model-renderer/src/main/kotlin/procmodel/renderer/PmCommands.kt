@@ -5,15 +5,14 @@ import com.github.knokko.boiler.instance.BoilerInstance
 import org.lwjgl.system.MemoryStack.stackPush
 import org.lwjgl.vulkan.VK10.*
 import org.lwjgl.vulkan.VkCommandBuffer
-import org.lwjgl.vulkan.VkDevice
 import procmodel.exceptions.PmRuntimeError
 import procmodel.renderer.config.PmPipelineInfo
 import procmodel.renderer.config.PmRenderPassInfo
 import java.util.concurrent.ConcurrentHashMap
 
-class PmCommands<Vertex, Matrix> internal constructor(
+class PmCommands<Matrix> internal constructor(
     private val boiler: BoilerInstance,
-    private val pipelineInfo: PmPipelineInfo<Vertex, Matrix>
+    private val pipelineInfo: PmPipelineInfo<Matrix>
 ) {
 
     private val pipelines = ConcurrentHashMap<PmRenderPassInfo, Long>()

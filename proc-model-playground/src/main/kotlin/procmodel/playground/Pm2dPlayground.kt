@@ -9,7 +9,6 @@ import com.github.knokko.boiler.pipelines.GraphicsPipelineBuilder
 import com.github.knokko.boiler.swapchain.SwapchainResourceManager
 import com.github.knokko.boiler.sync.ResourceUsage
 import com.github.knokko.boiler.sync.WaitSemaphore
-import graviks2d.util.Color
 import org.joml.Matrix3x2f
 import org.lwjgl.glfw.GLFW.glfwPollEvents
 import org.lwjgl.glfw.GLFW.glfwWindowShouldClose
@@ -21,12 +20,14 @@ import org.lwjgl.vulkan.VkDevice
 import org.lwjgl.vulkan.VkPhysicalDeviceVulkan13Features
 import org.lwjgl.vulkan.VkRenderingAttachmentInfo
 import org.lwjgl.vulkan.VkRenderingInfo
-import procmodel.model.PmModel
+import procmodel.lang.types.PmFloat
 import procmodel.renderer.MeshDrawTask
 import procmodel.renderer.PmInstance
 import procmodel.renderer.config.PmRenderPassInfo
-import procmodel2.Pm2dVertex
-import procmodel2.createPipelineInfo2d
+import procmodel2.Pm2dCompiler
+import procmodel2.Pm2dProcessor
+import procmodel2.createModelInfo2d
+import java.lang.System.nanoTime
 import java.lang.Thread.sleep
 
 fun main() {
@@ -34,7 +35,7 @@ fun main() {
         VK_API_VERSION_1_3, "Pm2dPlayground", VK_MAKE_VERSION(0, 1, 0)
     )
         .validation(ValidationFeatures(true, true, false, true, true))
-        .vkDeviceCreator { stack, vkPhysicalDevice, strings, vkDeviceCreateInfo ->
+        .vkDeviceCreator { stack, vkPhysicalDevice, _, vkDeviceCreateInfo ->
             // TODO Fix this in vk-boiler
             val pDevice = stack.callocPointer(1)
             val features = VkPhysicalDeviceVulkan13Features.calloc(stack)
@@ -46,12 +47,13 @@ fun main() {
             ), "CreateDevice", null)
             VkDevice(pDevice[0], vkPhysicalDevice, vkDeviceCreateInfo)
         }
-        .window(0, 1200, 700, BoilerSwapchainBuilder(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT))
+        .window(0, 700, 700, BoilerSwapchainBuilder(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT))
         .build()
 
-    val pipelineInfo = createPipelineInfo2d(boiler)
-    val procModel = PmInstance(boiler, pipelineInfo)
-    val cameraMatrix = Matrix3x2f()
+    val modelInfo = createModelInfo2d(boiler)
+    val procModel = PmInstance(boiler, modelInfo)
+    val transformationMatrices = procModel.createTransformationMatrices()
+    val cameraMatrix = Matrix3x2f().scale(1f, -1f)
     val renderPassInfo = PmRenderPassInfo.dynamicRendering(
         { ciRendering, stack ->
             ciRendering.colorAttachmentCount(1)
@@ -62,16 +64,11 @@ fun main() {
         }
     )
 
-    val model = PmModel(
-        vertices = listOf(
-            Pm2dVertex(-0.5f, -0.5f, Color.RED, 0),
-            Pm2dVertex(0.5f, -0.5f, Color.RED, 0),
-            Pm2dVertex(0f, 0.5f, Color.RED, 0),
-        ),
-        matrices = listOf(null),
-        dynamicParameters = emptyMap()
-    )
+    val program = Pm2dCompiler.compileFromClassPath("pm2-models", "mantid")
 
+    val staticParameters = Pm2dProcessor.loadStaticParametersFromClassPath("pm2-models", "mantid/default")
+
+    val model = Pm2dProcessor.execute(program, staticParameters)
     val mesh = procModel.meshes.allocate(model)
 
     val commandPool = boiler.commands.createPool(0, boiler.queueFamilies().graphics.index, "DrawPool")
@@ -127,13 +124,20 @@ fun main() {
             renderInfo.layerCount(1)
             renderInfo.pColorAttachments(colorAttachments)
 
-            procModel.transformationMatrices.computeAndStore(listOf(MeshDrawTask(mesh, emptyMap())))
+            val dynamicParameters = mapOf(
+                Pair("armAngle", PmFloat((nanoTime() % 3600_000_000) / 10_000_000f)),
+                Pair("legAngle", PmFloat(0f)),
+                Pair("kneeAngle", PmFloat(0f)),
+                Pair("footAngle", PmFloat(0f))
+            )
+
+            transformationMatrices.computeAndStore(listOf(MeshDrawTask(mesh, dynamicParameters)))
 
             vkCmdBeginRendering(commandBuffer, renderInfo)
 
             procModel.commands.recordDrawingCommands(
                 commandBuffer, renderPassInfo,
-                procModel.transformationMatrices.descriptorSet,
+                transformationMatrices.descriptorSet,
                 swapchainImage.width, swapchainImage.height,
                 listOf(Pair(mesh, 0)), cameraMatrix
             )
@@ -158,6 +162,7 @@ fun main() {
     }
 
     vkDeviceWaitIdle(boiler.vkDevice())
+    transformationMatrices.destroy()
     procModel.meshes.destroy(mesh)
     procModel.destroy()
     vkDestroyFence(boiler.vkDevice(), commandFence, null)

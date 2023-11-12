@@ -7,10 +7,7 @@ import org.lwjgl.vulkan.VkCommandBuffer
 import org.lwjgl.vulkan.VkDevice
 import java.nio.IntBuffer
 
-class PmPipelineInfo<Vertex, Matrix>(
-    val vertices: PmVertexInfo<Vertex>,
-    val matrices: PmMatrixInfo<Matrix>,
-
+class PmPipelineInfo<Matrix>(
     val pipelineLayout: Long,
     val descriptorSetLayout: Long,
     val createDescriptorPool: (amount: Int) -> Long,

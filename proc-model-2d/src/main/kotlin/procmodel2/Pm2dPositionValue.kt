@@ -4,7 +4,7 @@ import procmodel.exceptions.PmRuntimeError
 import procmodel.lang.types.PmFloat
 import procmodel.lang.types.PmValue
 
-class Pm2PositionValue(private val x: Float, private val y: Float) : PmValue() {
+class Pm2dPositionValue(private val x: Float, private val y: Float) : PmValue() {
 
     override fun setProperty(propertyName: String, newValue: PmValue) {
         throw PmRuntimeError("Positions are immutable")

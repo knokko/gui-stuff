@@ -3,7 +3,6 @@ package procmodel.renderer.config
 import org.lwjgl.system.MemoryStack
 import org.lwjgl.vulkan.VK10.VK_NULL_HANDLE
 import org.lwjgl.vulkan.VkGraphicsPipelineCreateInfo
-import org.lwjgl.vulkan.VkPipelineColorBlendStateCreateInfo
 import org.lwjgl.vulkan.VkPipelineRenderingCreateInfo
 
 /**

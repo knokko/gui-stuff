@@ -206,6 +206,7 @@ project(':proc-model-2d') {
 project(':proc-model-playground') {
     dependencies {
         implementation project(':graviks2d')
+        implementation project(':proc-model-core')
         implementation project(':proc-model-compiler')
         implementation project(':proc-model-processor')
         implementation project(':proc-model-renderer')

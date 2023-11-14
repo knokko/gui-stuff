@@ -3,7 +3,9 @@ package procmodel.playground
 import com.github.knokko.boiler.builder.BoilerBuilder
 import com.github.knokko.boiler.builder.BoilerSwapchainBuilder
 import com.github.knokko.boiler.builder.instance.ValidationFeatures
+import com.github.knokko.boiler.commands.CommandRecorder
 import com.github.knokko.boiler.exceptions.VulkanFailureException.assertVkSuccess
+import com.github.knokko.boiler.pipelines.GraphicsPipelineBuilder
 import com.github.knokko.boiler.swapchain.SwapchainResourceManager
 import com.github.knokko.boiler.sync.ResourceUsage
 import com.github.knokko.boiler.sync.WaitSemaphore
@@ -56,7 +58,7 @@ fun main() {
             ciRendering.pColorAttachmentFormats(stack.ints(boiler.swapchainSettings.surfaceFormat.format))
         },
         { ciPipeline, stack ->
-            boiler.pipelines.simpleColorBlending(stack, ciPipeline, 1)
+            GraphicsPipelineBuilder(ciPipeline, boiler, stack).simpleColorBlending(1)
         }
     )
 
@@ -102,11 +104,10 @@ fun main() {
                 boiler.vkDevice(), commandPool, 0
             ), "ResetCommandPool", "Drawing")
 
-            boiler.commands.begin(commandBuffer, stack, "Drawing")
+            val commands = CommandRecorder.begin(commandBuffer, boiler, stack, "Drawing")
 
-            boiler.commands.transitionColorLayout(
-                stack, commandBuffer, swapchainImage.vkImage,
-                VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, null,
+            commands.transitionColorLayout(
+                swapchainImage.vkImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, null,
                 ResourceUsage(VK_ACCESS_COLOR_ATTACHMENT_READ_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT)
             )
 
@@ -138,14 +139,13 @@ fun main() {
             )
             vkCmdEndRendering(commandBuffer)
 
-            boiler.commands.transitionColorLayout(
-                stack, commandBuffer, swapchainImage.vkImage,
-                VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+            commands.transitionColorLayout(
+                swapchainImage.vkImage, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
                 ResourceUsage(VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT),
                 ResourceUsage(0, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT)
             )
 
-            assertVkSuccess(vkEndCommandBuffer(commandBuffer), "EndCommandBuffer", "Drawing")
+            commands.end()
 
             boiler.queueFamilies().graphics.queues.first().submit(
                 commandBuffer, "Drawing",
@@ -162,5 +162,5 @@ fun main() {
     procModel.destroy()
     vkDestroyFence(boiler.vkDevice(), commandFence, null)
     vkDestroyCommandPool(boiler.vkDevice(), commandPool, null)
-    boiler.destroy()
+    boiler.destroyInitialObjects()
 }

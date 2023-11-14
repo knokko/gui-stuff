@@ -41,4 +41,10 @@ class PmFloat(private val value: Float) : PmValue() {
     override fun copy() = this
 
     override fun equals(other: Any?) = other is PmFloat && this.value == other.value
+
+    override fun compareTo(right: PmValue): Int {
+        return if (right is PmFloat) value.compareTo(right.value)
+        else super.compareTo(right)
+    }
+    override fun hashCode() = value.hashCode()
 }

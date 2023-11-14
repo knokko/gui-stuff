@@ -1,5 +1,6 @@
 package procmodel.renderer
 
+import com.github.knokko.boiler.commands.CommandRecorder
 import com.github.knokko.boiler.instance.BoilerInstance
 import org.lwjgl.system.MemoryStack.stackPush
 import org.lwjgl.vulkan.VK10.*
@@ -28,7 +29,7 @@ class PmCommands<Vertex, Matrix> internal constructor(
         stackPush().use { stack ->
             val pushBuffer = stack.callocInt(1)
             vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline)
-            boiler.commands.dynamicViewportAndScissor(stack, commandBuffer, viewportWidth, viewportHeight)
+            CommandRecorder.alreadyRecording(commandBuffer, boiler, stack).dynamicViewportAndScissor(viewportWidth, viewportHeight);
 
             vkCmdBindDescriptorSets(
                 commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineInfo.pipelineLayout,

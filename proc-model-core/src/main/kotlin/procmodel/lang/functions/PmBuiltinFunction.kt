@@ -11,6 +11,9 @@ class PmBuiltinFunction(
 ) {
 
     fun invoke(valueStack: MutableList<PmValue>) {
+        if (valueStack.size < parameterTypes.size) {
+            throw PmRuntimeError("Value stack (${valueStack.size} elements) is too small to call this function (${parameterTypes.size} parameters)")
+        }
         val parameterValues = parameterTypes.indices.map { valueStack.removeLast() }.reversed()
         for ((index, type) in parameterTypes.withIndex()) {
             if (!type.acceptValue(parameterValues[index])) {

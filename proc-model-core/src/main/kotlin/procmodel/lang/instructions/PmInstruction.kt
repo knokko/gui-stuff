@@ -72,7 +72,7 @@ class PmInstruction private constructor(
     }
 
     companion object {
-        fun pushValue(value: PmValue, lineNumber: Int) = PmInstruction(
+        fun pushValue(value: PmValue?, lineNumber: Int) = PmInstruction(
             PmInstructionType.PushValue, lineNumber, value = value
         )
 

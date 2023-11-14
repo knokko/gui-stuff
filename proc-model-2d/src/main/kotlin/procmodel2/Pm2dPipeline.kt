@@ -1,7 +1,7 @@
 package procmodel2
 
-import com.github.knokko.boiler.exceptions.VulkanFailureException
 import com.github.knokko.boiler.instance.BoilerInstance
+import com.github.knokko.boiler.pipelines.GraphicsPipelineBuilder
 import com.github.knokko.boiler.pipelines.ShaderInfo
 import org.lwjgl.system.MemoryStack
 import org.lwjgl.system.MemoryStack.stackPush
@@ -16,10 +16,7 @@ internal fun createGraphicsPipeline(
     vertexSize: Int
 ): Long {
     return stackPush().use { stack ->
-        val ciPipelines = VkGraphicsPipelineCreateInfo.calloc(1, stack)
-        val ciPipeline = ciPipelines[0]
-        ciPipeline.`sType$Default`()
-        ciPipeline.flags(0)
+        val pipelineBuilder = GraphicsPipelineBuilder(boiler, stack)
 
         val vertexShader = boiler.pipelines.createShaderModule(
             stack, "procmodel2/shaders/simple.vert.spv", "Pm2VertexShader"
@@ -27,31 +24,23 @@ internal fun createGraphicsPipeline(
         val fragmentShader = boiler.pipelines.createShaderModule(
             stack, "procmodel2/shaders/simple.frag.spv", "Pm2FragmentShader"
         )
-        boiler.pipelines.shaderStages(
-            stack, ciPipeline,
+        pipelineBuilder.shaderStages(
             ShaderInfo(VK_SHADER_STAGE_VERTEX_BIT, vertexShader, null),
             ShaderInfo(VK_SHADER_STAGE_FRAGMENT_BIT, fragmentShader, null)
         )
-        ciPipeline.pVertexInputState(createVertexInputState(stack, vertexSize))
-        boiler.pipelines.simpleInputAssembly(stack, ciPipeline)
-        boiler.pipelines.dynamicViewports(stack, ciPipeline, 1)
-        boiler.pipelines.simpleRasterization(stack, ciPipeline, VK_CULL_MODE_NONE) // TODO Cull back when switching to 3D
-        boiler.pipelines.noDepthStencil(stack, ciPipeline) // TODO Use depthStencil after switching to 3D
+        pipelineBuilder.ciPipeline.pVertexInputState(createVertexInputState(stack, vertexSize))
+        pipelineBuilder.simpleInputAssembly()
+        pipelineBuilder.dynamicViewports(1)
+        pipelineBuilder.simpleRasterization(VK_CULL_MODE_NONE) // TODO Cull back when switching to 3D
+        pipelineBuilder.noDepthStencil() // TODO Use depthStencil after switching to 3D
 
-        info.populateBlendState(ciPipeline, stack)
-        boiler.pipelines.dynamicStates(stack, ciPipeline, VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR)
-        boiler.pipelines.noMultisampling(stack, ciPipeline)
-        ciPipeline.layout(pipelineLayout)
-        info.populateRenderPass(ciPipeline, stack)
+        info.populateBlendState(pipelineBuilder.ciPipeline, stack)
+        pipelineBuilder.dynamicStates(VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR)
+        pipelineBuilder.noMultisampling()
+        pipelineBuilder.ciPipeline.layout(pipelineLayout)
+        info.populateRenderPass(pipelineBuilder.ciPipeline, stack)
 
-        val pPipeline = stack.callocLong(1)
-        VulkanFailureException.assertVkSuccess(
-            vkCreateGraphicsPipelines(
-                boiler.vkDevice(), VK_NULL_HANDLE, ciPipelines, null, pPipeline
-            ), "CreateGraphicsPipelines", "Pm2Pipeline"
-        )
-        val pipeline = pPipeline[0]
-        boiler.debug.name(stack, pipeline, VK_OBJECT_TYPE_PIPELINE, "Pm2Pipeline")
+        val pipeline = pipelineBuilder.build("Pm2Pipeline")
 
         vkDestroyShaderModule(boiler.vkDevice(), vertexShader, null)
         vkDestroyShaderModule(boiler.vkDevice(), fragmentShader, null)

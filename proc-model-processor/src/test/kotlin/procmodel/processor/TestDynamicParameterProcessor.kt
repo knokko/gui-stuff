@@ -64,7 +64,6 @@ class TestDynamicParameterProcessor {
         assertEquals(expected, processor.result)
     }
 
-    // TODO Try to use the parameters
     @Test
     fun testParameters() {
         val instructions = listOf(

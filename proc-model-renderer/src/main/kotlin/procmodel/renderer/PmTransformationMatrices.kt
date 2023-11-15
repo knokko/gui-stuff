@@ -25,20 +25,8 @@ class PmTransformationMatrices<Matrix> internal constructor(
     private val pipelineInfo: PmPipelineInfo<Matrix>,
     private val builtinFunctions: Map<String, PmBuiltinFunction>,
 ) {
-    // TODO Reuse some larger pool
-    private val descriptorPool = pipelineInfo.createDescriptorPool(1)
-    val descriptorSet: Long
+    val descriptorSet = pipelineInfo.descriptorBank.borrowDescriptorSet()
     private var matrixBuffer: MappedVmaBuffer? = null
-
-    init {
-        stackPush().use { stack ->
-            descriptorSet = boiler.descriptors.allocate(
-                stack, 1, descriptorPool,
-                "PmTransformationMatrices",
-                pipelineInfo.descriptorSetLayout
-            )[0]
-        }
-    }
 
     private fun ensureMatrixBuffer(requiredSize: Int) {
         if (matrixBuffer == null || matrixBuffer!!.size < requiredSize) {
@@ -134,7 +122,9 @@ class PmTransformationMatrices<Matrix> internal constructor(
     }
 
     fun destroy() {
-        vkDestroyDescriptorPool(boiler.vkDevice(), descriptorPool, null)
-        if (matrixBuffer != null) vmaDestroyBuffer(boiler.vmaAllocator(), matrixBuffer!!.vkBuffer, matrixBuffer!!.vmaAllocation)
+        pipelineInfo.descriptorBank.returnDescriptorSet(descriptorSet)
+        if (matrixBuffer != null) {
+            vmaDestroyBuffer(boiler.vmaAllocator(), matrixBuffer!!.vkBuffer, matrixBuffer!!.vmaAllocation)
+        }
     }
 }

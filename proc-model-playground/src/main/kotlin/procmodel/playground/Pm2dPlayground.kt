@@ -13,12 +13,9 @@ import org.joml.Matrix3x2f
 import org.lwjgl.glfw.GLFW.glfwPollEvents
 import org.lwjgl.glfw.GLFW.glfwWindowShouldClose
 import org.lwjgl.system.MemoryStack.stackPush
-import org.lwjgl.vulkan.KHRSurface.VK_PRESENT_MODE_FIFO_KHR
 import org.lwjgl.vulkan.KHRSurface.VK_PRESENT_MODE_MAILBOX_KHR
 import org.lwjgl.vulkan.KHRSwapchain.VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
 import org.lwjgl.vulkan.VK13.*
-import org.lwjgl.vulkan.VkDevice
-import org.lwjgl.vulkan.VkPhysicalDeviceVulkan13Features
 import org.lwjgl.vulkan.VkRenderingAttachmentInfo
 import org.lwjgl.vulkan.VkRenderingInfo
 import procmodel.lang.types.PmFloat
@@ -36,17 +33,9 @@ fun main() {
         VK_API_VERSION_1_3, "Pm2dPlayground", VK_MAKE_VERSION(0, 1, 0)
     )
         .validation(ValidationFeatures(true, true, false, true, true))
-        .vkDeviceCreator { stack, vkPhysicalDevice, _, vkDeviceCreateInfo ->
-            // TODO Fix this in vk-boiler
-            val pDevice = stack.callocPointer(1)
-            val features = VkPhysicalDeviceVulkan13Features.calloc(stack)
-            features.`sType$Default`()
-            features.dynamicRendering(true)
-            vkDeviceCreateInfo.pNext(features)
-            assertVkSuccess(vkCreateDevice(
-                vkPhysicalDevice, vkDeviceCreateInfo, null, pDevice
-            ), "CreateDevice", null)
-            VkDevice(pDevice[0], vkPhysicalDevice, vkDeviceCreateInfo)
+        .featurePicker13 { _, supportedFeatures, toEnable ->
+            if (!supportedFeatures.dynamicRendering()) throw UnsupportedOperationException("No dynamic rendering")
+            toEnable.dynamicRendering(true)
         }
         .window(0, 700, 700, BoilerSwapchainBuilder(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT))
         .build()

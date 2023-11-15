@@ -1,11 +1,10 @@
 package procmodel2
 
-import com.github.knokko.boiler.exceptions.VulkanFailureException.assertVkSuccess
+import com.github.knokko.boiler.descriptors.GrowingDescriptorBank
 import com.github.knokko.boiler.instance.BoilerInstance
 import org.joml.Matrix3x2f
 import org.lwjgl.system.MemoryStack.stackPush
 import org.lwjgl.vulkan.VK10.*
-import org.lwjgl.vulkan.VkDescriptorPoolCreateInfo
 import org.lwjgl.vulkan.VkDescriptorPoolSize
 import org.lwjgl.vulkan.VkDescriptorSetLayoutBinding
 import org.lwjgl.vulkan.VkPushConstantRange
@@ -51,26 +50,14 @@ fun createModelInfo2d(boiler: BoilerInstance): PmModelInfo<Pm2dVertex, Matrix3x2
             boiler, pipelineInfo, pipelineLayout, vertexSize
         ) },
         descriptorSetLayout = descriptorSetLayout,
-        createDescriptorPool = { amount ->
-            stackPush().use { stack ->
-                val descriptorPoolSizes = VkDescriptorPoolSize.calloc(1, stack)
-                descriptorPoolSizes.type(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
-                descriptorPoolSizes.descriptorCount(1)
+        descriptorBank = GrowingDescriptorBank(
+            boiler, descriptorSetLayout, "Pm2d"
+        ) { stack, ciPool ->
+            val poolSizes = VkDescriptorPoolSize.calloc(1, stack)
+            poolSizes.type(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
+            poolSizes.descriptorCount(1)
 
-                val ciDescriptorPool = VkDescriptorPoolCreateInfo.calloc(stack)
-                ciDescriptorPool.`sType$Default`()
-                ciDescriptorPool.flags(0)
-                ciDescriptorPool.maxSets(amount)
-                ciDescriptorPool.pPoolSizes(descriptorPoolSizes)
-
-                val pDescriptorPool = stack.callocLong(1)
-                assertVkSuccess(vkCreateDescriptorPool(
-                    boiler.vkDevice(), ciDescriptorPool, null, pDescriptorPool
-                ), "CreateDescriptorPool", "Pm2Descriptors")
-                val descriptorPool = pDescriptorPool[0]
-                boiler.debug.name(stack, descriptorPool, VK_OBJECT_TYPE_DESCRIPTOR_POOL, "Pm2Descriptors")
-                descriptorPool
-            }
+            ciPool.pPoolSizes(poolSizes)
         },
         pushCameraMatrix = { cameraMatrix, stack, commandBuffer ->
             val matrixBuffer = stack.callocFloat(3 * 2)

@@ -40,8 +40,8 @@ class PmVariableScope {
     }
 
     fun getVariable(name: String): PmValue? {
-        for (scope in scopes.reversed()) {
-            val maybeVariable = scope[name]
+        for (index in scopes.size - 1 downTo 0) {
+            val maybeVariable = scopes[index][name]
             if (maybeVariable != null) return maybeVariable.second
         }
         return null

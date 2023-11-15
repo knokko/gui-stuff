@@ -7,7 +7,7 @@ class PmType(
     val createDefaultValue: (() -> PmValue)?,
     val valueClass: KClass<*>
 ) {
-    fun acceptValue(value: PmValue) = valueClass.isInstance(value)
+    fun acceptValue(value: PmValue) = valueClass.java.isInstance(value)
 
     override fun toString() = name
 }

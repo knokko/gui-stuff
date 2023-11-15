@@ -9,5 +9,5 @@ class PmMesh internal constructor(
     internal val vertexOffset: Int,
     internal val numVertices: Int,
     internal val matrices: List<PmDynamicMatrix?>,
-    internal val dynamicParameterTypes: Map<String, PmType>
+    val dynamicParameterTypes: Map<String, PmType>
 )

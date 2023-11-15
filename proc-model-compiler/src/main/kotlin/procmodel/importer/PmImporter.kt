@@ -75,7 +75,7 @@ class PmImporter<VertexValue : PmValue>(
         if (cachedTriangles != null) return cachedTriangles
 
         val input = cache.importFunctions.getBinaryInput(fullPath) ?: throw PmCompileError("Can't import $fullPath")
-        val importedTriangles = parseShape(input, parseVertex)
+        val importedTriangles = PmShapes.parse(input, parseVertex)
         input.close()
 
         cache.triangles[fullPath] = importedTriangles

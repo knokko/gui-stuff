@@ -221,3 +221,27 @@ project(':proc-model-playground') {
         runtimeOnly "org.lwjgl:lwjgl-glfw::$lwjglNatives"
     }
 }
+
+project(':proc-model-editor2d') {
+    dependencies {
+        implementation project(':graviks2d')
+        implementation project(':graviks-glfw')
+        implementation project(':gruviks')
+        implementation project(':gruviks-glfw')
+
+        implementation project(':proc-model-core')
+        implementation project(':proc-model-compiler')
+        implementation project(':proc-model-processor')
+        implementation project(':proc-model-renderer')
+        implementation project(':proc-model-2d')
+
+        implementation 'com.github.knokko:sample-profiler:v1.0.0'
+        implementation "org.lwjgl:lwjgl-glfw"
+        implementation 'org.antlr:antlr4:4.13.0'
+
+        runtimeOnly "org.lwjgl:lwjgl::$lwjglNatives"
+        runtimeOnly "org.lwjgl:lwjgl-vma::$lwjglNatives"
+        if (lwjglNatives == "natives-macos") runtimeOnly "org.lwjgl:lwjgl-vulkan::$lwjglNatives"
+        runtimeOnly "org.lwjgl:lwjgl-glfw::$lwjglNatives"
+    }
+}

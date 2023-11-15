@@ -3,7 +3,7 @@ package gruviks.component.menu.controller
 import gruviks.component.menu.SimpleFlatMenu
 import gruviks.event.Event
 
-abstract class SimpleFlatController {
+abstract class SimpleFlatController(internal val processLate: Boolean = false) {
     protected lateinit var menu: SimpleFlatMenu
 
     fun init(menu: SimpleFlatMenu) {

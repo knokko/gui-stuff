@@ -154,7 +154,10 @@ class SimpleFlatMenu(
     }
 
     override fun processEvent(event: Event) {
-        for (controller in controllers) controller.processEvent(event)
+        for (controller in controllers) {
+            // TODO Test this
+            if (!controller.processLate) controller.processEvent(event)
+        }
         updateComponentTree(true)
 
         val visitedNodes = mutableSetOf<ComponentNode>()
@@ -299,6 +302,11 @@ class SimpleFlatMenu(
             updateNode(node, true)
         }
 
+        updateComponentTree(true)
+        for (controller in controllers) {
+            // TODO Test this
+            if (controller.processLate) controller.processEvent(event)
+        }
         updateComponentTree(true)
     }
 

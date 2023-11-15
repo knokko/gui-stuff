@@ -33,6 +33,8 @@ class GraviksWindow(
     applicationName: String,
     applicationVersion: Int,
     preferPowerfulDevice: Boolean,
+    chainBoiler: (BoilerBuilder) -> BoilerBuilder = { it },
+    apiVersion: Int = 0,
     private val createContext: (instance: GraviksInstance, width: Int, height: Int) -> GraviksContext
 ) {
 
@@ -56,8 +58,8 @@ class GraviksWindow(
 
         var canAwaitPresent = false
 
-        this.boiler = BoilerBuilder(
-            VK_API_VERSION_1_0, applicationName, applicationVersion
+        this.boiler = chainBoiler(BoilerBuilder(
+            apiVersion, applicationName, applicationVersion
         )
             .window(0L, initialWidth, initialHeight, BoilerSwapchainBuilder(
                 VK_IMAGE_USAGE_TRANSFER_DST_BIT
@@ -96,7 +98,7 @@ class GraviksWindow(
                 }
                 DEFAULT_VK_DEVICE_CREATOR.vkCreateDevice(stack, vkPhysicalDevice, deviceExtensions, ciDevice)
             }
-            .build()
+        ).build()
 
         this.canAwaitPresent = canAwaitPresent
         this.hasIncrementalPresent = boiler.deviceExtensions.contains(VK_KHR_INCREMENTAL_PRESENT_EXTENSION_NAME)

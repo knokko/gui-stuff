@@ -1,4 +1,4 @@
 rootProject.name = 'gui-stuff'
 include 'graviks2d', 'gruviks', 'graviks-glfw', 'gruviks-glfw', 'dsl-playground',
         'proc-model-core', 'proc-model-processor', 'proc-model-compiler', 'proc-model-test-case', 'proc-model-renderer',
-        'proc-model-2d', 'proc-model-playground'
+        'proc-model-2d', 'proc-model-playground', 'proc-model-editor2d'

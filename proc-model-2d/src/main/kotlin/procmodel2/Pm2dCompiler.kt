@@ -1,12 +1,10 @@
 package procmodel2
 
-import graviks2d.util.Color
 import procmodel.compiler.PmCompiler
 import procmodel.importer.PmClassPathImportFunctions
 import procmodel.importer.PmDummyImportFunctions
 import procmodel.importer.PmImportCache
 import procmodel.importer.PmImporter
-import procmodel.lang.types.PmColor
 import procmodel.program.PmProgram
 import java.util.*
 
@@ -26,16 +24,12 @@ object Pm2dCompiler {
         PmImportCache(PmDummyImportFunctions()), "") { _ -> Pm2dVertexValue() }
     )
 
-    fun createClassPathIporter(prefix: String) = PmImporter(PmImportCache(PmClassPathImportFunctions(prefix)), "") { attributes ->
-        val vertex = Pm2dVertexValue()
-        vertex.setProperty("position", Pm2dPositionValue(attributes["x"] as Float, attributes["y"] as Float))
-        val rawColor = attributes["color"]
-        if (rawColor != null) vertex.setProperty("color", PmColor(Color.raw(rawColor as Int)))
-        vertex
-    }
+    fun createClassPathImporter(prefix: String) = PmImporter(
+        PmImportCache(PmClassPathImportFunctions(prefix)), "", Pm2dShapes::parseVertex
+    )
 
     fun compileFromClassPath(prefix: String, mainFile: String): PmProgram {
-        val importer = createClassPathIporter(prefix)
+        val importer = createClassPathImporter(prefix)
 
         val sourceCode = StringBuilder()
         val sourceCodeScanner = Scanner(PmImporter::class.java.classLoader.getResourceAsStream("$prefix/$mainFile.pm2"))

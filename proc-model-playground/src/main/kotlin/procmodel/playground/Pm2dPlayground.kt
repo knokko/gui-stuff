@@ -14,6 +14,7 @@ import org.lwjgl.glfw.GLFW.glfwPollEvents
 import org.lwjgl.glfw.GLFW.glfwWindowShouldClose
 import org.lwjgl.system.MemoryStack.stackPush
 import org.lwjgl.vulkan.KHRSurface.VK_PRESENT_MODE_FIFO_KHR
+import org.lwjgl.vulkan.KHRSurface.VK_PRESENT_MODE_MAILBOX_KHR
 import org.lwjgl.vulkan.KHRSwapchain.VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
 import org.lwjgl.vulkan.VK13.*
 import org.lwjgl.vulkan.VkDevice
@@ -86,10 +87,20 @@ fun main() {
         { imageView -> vkDestroyImageView(boiler.vkDevice(), imageView, null) }
     )
 
+    var lastReferenceTime = nanoTime()
+    var fpsCounter = 0
+
     while (!glfwWindowShouldClose(boiler.glfwWindow())) {
+        val currentTime = nanoTime()
+        if (currentTime - lastReferenceTime > 1_000_000_000L) {
+            lastReferenceTime = currentTime
+            println("fps is $fpsCounter")
+            fpsCounter = 0
+        }
+        fpsCounter += 1
         glfwPollEvents()
 
-        val swapchainImage = boiler.swapchains.acquireNextImage(VK_PRESENT_MODE_FIFO_KHR)
+        val swapchainImage = boiler.swapchains.acquireNextImage(VK_PRESENT_MODE_MAILBOX_KHR)
         if (swapchainImage == null) {
             sleep(100)
             continue

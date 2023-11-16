@@ -29,7 +29,7 @@ matrix midMatrix = dynamic Matrix<float legPartLength> {
 	Matrix midMatrix;
 	translate(midMatrix, 0.0, -1.0 * legPartLength);
 	rotate(midMatrix, kneeAngle);
-	midMatrix
+	outputValue(midMatrix);
 };
 
 Vertex bottomLeft;
@@ -49,7 +49,7 @@ matrix footMatrix = dynamic Matrix<float legPartLength, float legRadius> {
 	translate(footMatrix, 0.0, -1.06 * legPartLength);
 	rotate(footMatrix, footAngle);
 	scale(footMatrix, 10.0 * legRadius, 10.0 * legRadius);
-	footMatrix
+	outputValue(footMatrix);
 };
 
 produceTriangle(midLeft, midRight, topRight);

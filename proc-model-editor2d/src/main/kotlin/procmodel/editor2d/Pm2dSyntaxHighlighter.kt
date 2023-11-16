@@ -10,6 +10,7 @@ import org.antlr.v4.runtime.dfa.DFA
 import org.antlr.v4.runtime.tree.ParseTree
 import org.antlr.v4.runtime.tree.ParseTreeWalker
 import org.antlr.v4.runtime.tree.TerminalNode
+import procmodel.compiler.PmCompiler
 import procmodel.compiler.generated.ProcModelBaseListener
 import procmodel.compiler.generated.ProcModelLexer
 import procmodel.compiler.generated.ProcModelParser
@@ -150,7 +151,10 @@ private class Pm2dSyntaxHighlighter(
 
     override fun exitFunctionInvocation(ctx: ProcModelParser.FunctionInvocationContext?) {
         val functionName = ctx!!.IDENTIFIER().text
-        if (PmBuiltinFunctions.MAP.containsKey(functionName) || Pm2dBuiltinFunctions.all.containsKey(functionName)) {
+        if (PmBuiltinFunctions.MAP.containsKey(functionName)
+            || Pm2dBuiltinFunctions.all.containsKey(functionName)
+            || PmCompiler.extraFunctions.containsKey(functionName)
+        ) {
             insert(colorTheme.builtinFunctionCall, ctx.IDENTIFIER().symbol, ctx.IDENTIFIER().symbol)
         }
     }

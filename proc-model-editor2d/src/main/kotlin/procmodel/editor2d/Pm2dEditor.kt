@@ -32,7 +32,7 @@ import procmodel2.createModelInfo2d
 import java.io.File
 import java.io.PrintWriter
 
-internal val rootDirectory = File("proc-model-test-case/src/main/resources/procmodel/test/")
+internal val rootDirectory = File("pm2-models/")
 
 private class SaveOnQuitController(
     val openFiles: List<OpenFile>, val boiler: BoilerInstance, val pmInstance: PmInstance<Pm2dVertex, Matrix3x2f>

@@ -120,27 +120,6 @@ project(':gruviks-glfw') {
     }
 }
 
-project(':dsl-playground') {
-    dependencies {
-        implementation project(':graviks2d')
-        implementation project(':graviks-glfw')
-        implementation project(':gruviks')
-        implementation project(':gruviks-glfw')
-
-        implementation 'com.github.knokko:sample-profiler:v1.0.0'
-
-        implementation 'org.antlr:antlr4:4.13.0'
-        implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
-        implementation "org.lwjgl:lwjgl-glfw"
-
-        runtimeOnly "org.lwjgl:lwjgl::$lwjglNatives"
-        runtimeOnly "org.lwjgl:lwjgl-vma::$lwjglNatives"
-        if (lwjglNatives == "natives-macos") runtimeOnly "org.lwjgl:lwjgl-vulkan::$lwjglNatives"
-        runtimeOnly "org.lwjgl:lwjgl-glfw::$lwjglNatives"
-        runtimeOnly "org.lwjgl:lwjgl-stb::$lwjglNatives"
-    }
-}
-
 project(':proc-model-core') {
     dependencies {
         implementation project(':graviks2d') // TODO Move graviks2d.Color to separate module and depend on that instead

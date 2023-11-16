@@ -119,7 +119,7 @@ for (0 <= currentFlower < 70) {
 		Matrix thisMatrix;
 		Random rng;
 		translate(thisMatrix, startX, startY + 0.03 * rng.nextFloat);
-		thisMatrix
+		outputValue(thisMatrix);
 	};
 	produceFlower(0.0, 0.0, thisMatrix, stemLength, stemRadius, stemColor, flowerRadius, flowerColor, leafColor);
 	startY = startY - 0.5 * rng.nextFloat;

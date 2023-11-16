@@ -19,7 +19,6 @@ import procmodel.lang.types.*
 import procmodel.program.*
 import java.io.File
 import java.io.PrintWriter
-import java.lang.RuntimeException
 
 class PmCompiler<VertexValue : PmValue>(
     private val importer: PmImporter<VertexValue>,
@@ -46,7 +45,6 @@ class PmCompiler<VertexValue : PmValue>(
     lateinit var program: PmProgram
 
     private fun getParameterCountOfBuiltinFunction(name: String): Int? {
-        if (name == "outputValue") return 1
         val builtinFunction = PmBuiltinFunctions.MAP[name]
         if (builtinFunction != null) return builtinFunction.parameterTypes.size
         return extraFunctions[name]
@@ -499,7 +497,7 @@ class PmCompiler<VertexValue : PmValue>(
             extraTypes: List<PmType>,
             isChild: Boolean = false
         ): PmProgram {
-            val compiler = PmCompiler(importer, extraFunctions, extraTypes, isChild)
+            val compiler = PmCompiler(importer, extraFunctions + PmCompiler.extraFunctions, extraTypes, isChild)
 
             val lexer = ProcModelLexer(CharStreams.fromString(sourceCode))
             val parser = ProcModelParser(CommonTokenStream(lexer))
@@ -523,5 +521,10 @@ class PmCompiler<VertexValue : PmValue>(
 
             return compiler.program
         }
+
+        val extraFunctions = mapOf(
+            Pair("outputValue", 1),
+            Pair("produceTriangle", 3)
+        )
     }
 }

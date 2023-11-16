@@ -17,7 +17,7 @@ object Pm2dCompiler {
     )
 
     fun compile(sourceCode: String, importer: PmImporter<Pm2dVertexValue>) = PmCompiler.compile(
-        sourceCode, importer, extraFunctions + mapOf(Pair("produceTriangle", 3)), Pm2dTypes.all
+        sourceCode, importer, extraFunctions, Pm2dTypes.all
     )
 
     fun compile(sourceCode: String) = compile(sourceCode, PmImporter(

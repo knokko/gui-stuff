@@ -119,7 +119,10 @@ class Pm2PreviewComponent(
             agent.giveFeedback(RenderFeedback())
         }
         if (event is RemoveEvent) {
-            boiler.sync.fenceBank.returnFence(previewFence, shouldAwaitFence)
+            if (shouldAwaitFence) {
+                stackPush().use { stack -> boiler.sync.waitAndReset(stack, previewFence, 1_000_000_000L) }
+            }
+            boiler.sync.fenceBank.returnFence(previewFence, false)
             vkDestroyCommandPool(boiler.vkDevice(), previewCommandPool, null)
             if (this::previewImage.isInitialized) {
                 vkDestroyImageView(boiler.vkDevice(), previewImage.vkImageView, null)

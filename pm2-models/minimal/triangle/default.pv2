@@ -1,3 +1,0 @@
-Map parameters;
-parameters["color"] = rgb(1.0, 0.0, 1.0);
-outputValue(parameters);

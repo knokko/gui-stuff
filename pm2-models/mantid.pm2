@@ -15,14 +15,14 @@ matrix rightScytheMatrix = dynamic Matrix {
 	Matrix scytheMatrix;
 	translate(scytheMatrix, 0.1, 0.3);
 	rotate(scytheMatrix, armAngle);
-	scytheMatrix
+	outputValue(scytheMatrix);
 };
 matrix leftScytheMatrix = dynamic Matrix {
 	Matrix scytheMatrix;
 	translate(scytheMatrix, 0.1, 0.3);
 	rotate(scytheMatrix, armAngle * 1.5);
 	scale(scytheMatrix, 0.9, 0.9);
-	scytheMatrix
+	outputValue(scytheMatrix);
 };
 
 matrix leftBackLegMatrix = dynamic Matrix {
@@ -30,7 +30,7 @@ matrix leftBackLegMatrix = dynamic Matrix {
 	translate(legMatrix, -0.3, 0.0);
 	scale(legMatrix, -0.8, 0.8);
 	rotate(legMatrix, legAngle * 0.7);
-	legMatrix
+	outputValue(legMatrix);
 };
 
 matrix leftFrontLegMatrix = dynamic Matrix {
@@ -38,7 +38,7 @@ matrix leftFrontLegMatrix = dynamic Matrix {
 	translate(legMatrix, -0.2, 0.0);
 	scale(legMatrix, 0.95, 0.95);
 	rotate(legMatrix, legAngle * 1.5);
-	legMatrix
+	outputValue(legMatrix);
 };
 
 matrix rightBackLegMatrix = dynamic Matrix {
@@ -46,14 +46,14 @@ matrix rightBackLegMatrix = dynamic Matrix {
 	translate(legMatrix, -0.3, 0.0);
 	scale(legMatrix, -1.0, 1.0);
 	rotate(legMatrix, legAngle);
-	legMatrix
+	outputValue(legMatrix);
 };
 
 matrix rightFrontLegMatrix = dynamic Matrix {
 	Matrix legMatrix;
 	translate(legMatrix, -0.2, 0.0);
 	rotate(legMatrix, legAngle);
-	legMatrix
+	outputValue(legMatrix);
 };
 
 matrix defaultMatrix;
@@ -64,23 +64,23 @@ child model leg(leftBackLegMatrix, legParameters) {
 	Map params;
 	params["kneeAngle"] = kneeAngle;
 	params["footAngle"] = footAngle;
-	params
+	outputValue(params);
 };
 child model leg(leftFrontLegMatrix, legParameters) {
 	Map params;
 	params["kneeAngle"] = kneeAngle;
 	params["footAngle"] = footAngle;
-	params
+	outputValue(params);
 };
 child model leg(rightBackLegMatrix, legParameters) {
 	Map params;
 	params["kneeAngle"] = kneeAngle;
 	params["footAngle"] = kneeAngle;
-	params
+	outputValue(params);
 };
 child model leg(rightFrontLegMatrix, legParameters) {
 	Map params;
 	params["kneeAngle"] = kneeAngle;
 	params["footAngle"] = footAngle * 2.0;
-	params
+	outputValue(params);
 };

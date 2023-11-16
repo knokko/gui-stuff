@@ -269,25 +269,25 @@ public class ProcModelBaseListener implements ProcModelListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterReadArrayOrMap(ProcModelParser.ReadArrayOrMapContext ctx) { }
+	@Override public void enterReadIndexed(ProcModelParser.ReadIndexedContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitReadArrayOrMap(ProcModelParser.ReadArrayOrMapContext ctx) { }
+	@Override public void exitReadIndexed(ProcModelParser.ReadIndexedContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterUpdateArrayOrMap(ProcModelParser.UpdateArrayOrMapContext ctx) { }
+	@Override public void enterWriteIndexed(ProcModelParser.WriteIndexedContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitUpdateArrayOrMap(ProcModelParser.UpdateArrayOrMapContext ctx) { }
+	@Override public void exitWriteIndexed(ProcModelParser.WriteIndexedContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

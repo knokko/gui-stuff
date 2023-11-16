@@ -26,7 +26,7 @@ class LoggedGraviksTarget: GraviksTarget {
     override fun getScissor() = currentScissor
 
     override fun fillTriangle(x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float, color: Color) {
-        TODO("Not yet implemented")
+        throw UnsupportedOperationException()
     }
 
     override fun fillRect(x1: Float, y1: Float, x2: Float, y2: Float, color: Color) {
@@ -36,7 +36,7 @@ class LoggedGraviksTarget: GraviksTarget {
     }
 
     override fun drawRect(x1: Float, y1: Float, x2: Float, y2: Float, lineWidth: Float, color: Color) {
-        TODO()
+        throw UnsupportedOperationException()
     }
 
     override fun drawRoundedRect(
@@ -48,15 +48,15 @@ class LoggedGraviksTarget: GraviksTarget {
         lineWidth: Float,
         color: Color
     ) {
-        TODO("Not yet implemented")
+        throw UnsupportedOperationException()
     }
 
     override fun drawImage(xLeft: Float, yBottom: Float, xRight: Float, yTop: Float, image: ImageReference) {
-        TODO("Not yet implemented")
+        throw UnsupportedOperationException()
     }
 
     override fun getImageSize(image: ImageReference): Pair<Int, Int> {
-        TODO("Not yet implemented")
+        throw UnsupportedOperationException()
     }
 
     override fun drawString(
@@ -69,7 +69,7 @@ class LoggedGraviksTarget: GraviksTarget {
         dryRun: Boolean,
         suggestLeftToRight: Boolean
     ): List<CharacterPosition> {
-        TODO("Not yet implemented")
+        throw UnsupportedOperationException()
     }
 
     override fun getStringAspectRatio(string: String, fontReference: FontReference?) = 10f

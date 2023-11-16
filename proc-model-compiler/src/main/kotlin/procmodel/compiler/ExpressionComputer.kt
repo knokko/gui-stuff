@@ -25,7 +25,7 @@ internal object ExpressionComputer {
         if (ctx.variableProperty() != null) return PmInstruction.pushProperty(
             ctx.variableProperty().IDENTIFIER().text, ctx.start.line
         )
-        if (ctx.readArrayOrMap() != null) return PmInstruction.readListOrMap(ctx.start.line)
+        if (ctx.readIndexed() != null) return PmInstruction.readIndexed(ctx.start.line)
 
         if (ctx.DIVIDE() != null) return PmInstruction.divide(ctx.start.line)
         if (ctx.TIMES() != null) return PmInstruction.multiply(ctx.start.line)

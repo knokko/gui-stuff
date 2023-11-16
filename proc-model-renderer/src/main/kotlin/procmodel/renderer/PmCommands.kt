@@ -43,7 +43,7 @@ class PmCommands<Matrix> internal constructor(
             for (vertexBuffer in vertexBuffers) {
                 val currentMeshes = meshesWithMatrices.filter { it.first.vertexBuffer.vkBuffer == vertexBuffer }
                 vkCmdBindVertexBuffers(commandBuffer, 0, stack.longs(vertexBuffer), stack.longs(0))
-                // TODO Experiment with optimizations
+                // OPTIMIZE maybe less draw calls?
                 for ((mesh, matrixIndexOffset) in currentMeshes) {
 
                     pushBuffer.put(0, matrixIndexOffset)

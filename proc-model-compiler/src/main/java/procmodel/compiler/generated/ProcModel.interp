@@ -90,8 +90,8 @@ variableReassignment
 variableReassignmentTarget
 functionDeclaration
 functionInvocation
-readArrayOrMap
-updateArrayOrMap
+readIndexed
+writeIndexed
 expression
 variableProperty
 positionConstructor

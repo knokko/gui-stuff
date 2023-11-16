@@ -15,7 +15,7 @@ innerStatement :
     functionDeclaration |
     childModel |
     functionInvocation ';' |
-    updateArrayOrMap |
+    writeIndexed |
     forLoop;
 
 relativeImportPrefix: './';
@@ -54,9 +54,9 @@ functionDeclaration : IDENTIFIER IDENTIFIER '(' ((IDENTIFIER IDENTIFIER ',')* ID
 
 functionInvocation : IDENTIFIER '(' ((expression ',')* expression)? ')';
 
-readArrayOrMap: '[' expression ']';
+readIndexed: '[' expression ']';
 
-updateArrayOrMap: expression '[' expression ']' '=' expression ';';
+writeIndexed: expression '[' expression ']' '=' expression ';';
 
 expression :
     FLOAT_LITERAL |
@@ -65,7 +65,7 @@ expression :
     IDENTIFIER |
     functionInvocation |
     expression variableProperty |
-    expression readArrayOrMap |
+    expression readIndexed |
     '(' expression ')' |
     positionConstructor |
     listDeclaration |

@@ -29,8 +29,8 @@ public class ProcModelParser extends Parser {
 		RULE_dynamicBlock = 10, RULE_childModelBlock = 11, RULE_dynamicDeclarationBlock = 12, 
 		RULE_childModel = 13, RULE_parameterDeclaration = 14, RULE_dynamicDeclaration = 15, 
 		RULE_variableDeclaration = 16, RULE_variableReassignment = 17, RULE_variableReassignmentTarget = 18, 
-		RULE_functionDeclaration = 19, RULE_functionInvocation = 20, RULE_readArrayOrMap = 21, 
-		RULE_updateArrayOrMap = 22, RULE_expression = 23, RULE_variableProperty = 24, 
+		RULE_functionDeclaration = 19, RULE_functionInvocation = 20, RULE_readIndexed = 21, 
+		RULE_writeIndexed = 22, RULE_expression = 23, RULE_variableProperty = 24, 
 		RULE_positionConstructor = 25, RULE_listElement = 26, RULE_listDeclaration = 27, 
 		RULE_forLoop = 28, RULE_forLoopHeader = 29, RULE_forLoopVariable = 30, 
 		RULE_forLoopComparator1 = 31, RULE_forLoopComparator2 = 32, RULE_forLoopComparator = 33;
@@ -41,10 +41,9 @@ public class ProcModelParser extends Parser {
 			"importAlias", "importValue", "dynamicBlock", "childModelBlock", "dynamicDeclarationBlock", 
 			"childModel", "parameterDeclaration", "dynamicDeclaration", "variableDeclaration", 
 			"variableReassignment", "variableReassignmentTarget", "functionDeclaration", 
-			"functionInvocation", "readArrayOrMap", "updateArrayOrMap", "expression", 
-			"variableProperty", "positionConstructor", "listElement", "listDeclaration", 
-			"forLoop", "forLoopHeader", "forLoopVariable", "forLoopComparator1", 
-			"forLoopComparator2", "forLoopComparator"
+			"functionInvocation", "readIndexed", "writeIndexed", "expression", "variableProperty", 
+			"positionConstructor", "listElement", "listDeclaration", "forLoop", "forLoopHeader", 
+			"forLoopVariable", "forLoopComparator1", "forLoopComparator2", "forLoopComparator"
 		};
 	}
 	public static final String[] ruleNames = makeRuleNames();
@@ -288,8 +287,8 @@ public class ProcModelParser extends Parser {
 		public FunctionInvocationContext functionInvocation() {
 			return getRuleContext(FunctionInvocationContext.class,0);
 		}
-		public UpdateArrayOrMapContext updateArrayOrMap() {
-			return getRuleContext(UpdateArrayOrMapContext.class,0);
+		public WriteIndexedContext writeIndexed() {
+			return getRuleContext(WriteIndexedContext.class,0);
 		}
 		public ForLoopContext forLoop() {
 			return getRuleContext(ForLoopContext.class,0);
@@ -361,7 +360,7 @@ public class ProcModelParser extends Parser {
 				enterOuterAlt(_localctx, 6);
 				{
 				setState(90);
-				updateArrayOrMap();
+				writeIndexed();
 				}
 				break;
 			case 7:
@@ -1571,32 +1570,32 @@ public class ProcModelParser extends Parser {
 	}
 
 	@SuppressWarnings("CheckReturnValue")
-	public static class ReadArrayOrMapContext extends ParserRuleContext {
+	public static class ReadIndexedContext extends ParserRuleContext {
 		public ExpressionContext expression() {
 			return getRuleContext(ExpressionContext.class,0);
 		}
-		public ReadArrayOrMapContext(ParserRuleContext parent, int invokingState) {
+		public ReadIndexedContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_readArrayOrMap; }
+		@Override public int getRuleIndex() { return RULE_readIndexed; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ProcModelListener ) ((ProcModelListener)listener).enterReadArrayOrMap(this);
+			if ( listener instanceof ProcModelListener ) ((ProcModelListener)listener).enterReadIndexed(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ProcModelListener ) ((ProcModelListener)listener).exitReadArrayOrMap(this);
+			if ( listener instanceof ProcModelListener ) ((ProcModelListener)listener).exitReadIndexed(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ProcModelVisitor ) return ((ProcModelVisitor<? extends T>)visitor).visitReadArrayOrMap(this);
+			if ( visitor instanceof ProcModelVisitor ) return ((ProcModelVisitor<? extends T>)visitor).visitReadIndexed(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 
-	public final ReadArrayOrMapContext readArrayOrMap() throws RecognitionException {
-		ReadArrayOrMapContext _localctx = new ReadArrayOrMapContext(_ctx, getState());
-		enterRule(_localctx, 42, RULE_readArrayOrMap);
+	public final ReadIndexedContext readIndexed() throws RecognitionException {
+		ReadIndexedContext _localctx = new ReadIndexedContext(_ctx, getState());
+		enterRule(_localctx, 42, RULE_readIndexed);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
@@ -1620,35 +1619,35 @@ public class ProcModelParser extends Parser {
 	}
 
 	@SuppressWarnings("CheckReturnValue")
-	public static class UpdateArrayOrMapContext extends ParserRuleContext {
+	public static class WriteIndexedContext extends ParserRuleContext {
 		public List<ExpressionContext> expression() {
 			return getRuleContexts(ExpressionContext.class);
 		}
 		public ExpressionContext expression(int i) {
 			return getRuleContext(ExpressionContext.class,i);
 		}
-		public UpdateArrayOrMapContext(ParserRuleContext parent, int invokingState) {
+		public WriteIndexedContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_updateArrayOrMap; }
+		@Override public int getRuleIndex() { return RULE_writeIndexed; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ProcModelListener ) ((ProcModelListener)listener).enterUpdateArrayOrMap(this);
+			if ( listener instanceof ProcModelListener ) ((ProcModelListener)listener).enterWriteIndexed(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ProcModelListener ) ((ProcModelListener)listener).exitUpdateArrayOrMap(this);
+			if ( listener instanceof ProcModelListener ) ((ProcModelListener)listener).exitWriteIndexed(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof ProcModelVisitor ) return ((ProcModelVisitor<? extends T>)visitor).visitUpdateArrayOrMap(this);
+			if ( visitor instanceof ProcModelVisitor ) return ((ProcModelVisitor<? extends T>)visitor).visitWriteIndexed(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 
-	public final UpdateArrayOrMapContext updateArrayOrMap() throws RecognitionException {
-		UpdateArrayOrMapContext _localctx = new UpdateArrayOrMapContext(_ctx, getState());
-		enterRule(_localctx, 44, RULE_updateArrayOrMap);
+	public final WriteIndexedContext writeIndexed() throws RecognitionException {
+		WriteIndexedContext _localctx = new WriteIndexedContext(_ctx, getState());
+		enterRule(_localctx, 44, RULE_writeIndexed);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
@@ -1710,8 +1709,8 @@ public class ProcModelParser extends Parser {
 		public VariablePropertyContext variableProperty() {
 			return getRuleContext(VariablePropertyContext.class,0);
 		}
-		public ReadArrayOrMapContext readArrayOrMap() {
-			return getRuleContext(ReadArrayOrMapContext.class,0);
+		public ReadIndexedContext readIndexed() {
+			return getRuleContext(ReadIndexedContext.class,0);
 		}
 		public ExpressionContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -1879,7 +1878,7 @@ public class ProcModelParser extends Parser {
 						setState(287);
 						if (!(precpred(_ctx, 7))) throw new FailedPredicateException(this, "precpred(_ctx, 7)");
 						setState(288);
-						readArrayOrMap();
+						readIndexed();
 						}
 						break;
 					}

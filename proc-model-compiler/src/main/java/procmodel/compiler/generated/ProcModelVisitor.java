@@ -137,17 +137,17 @@ public interface ProcModelVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitFunctionInvocation(ProcModelParser.FunctionInvocationContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link ProcModelParser#readArrayOrMap}.
+	 * Visit a parse tree produced by {@link ProcModelParser#readIndexed}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitReadArrayOrMap(ProcModelParser.ReadArrayOrMapContext ctx);
+	T visitReadIndexed(ProcModelParser.ReadIndexedContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link ProcModelParser#updateArrayOrMap}.
+	 * Visit a parse tree produced by {@link ProcModelParser#writeIndexed}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitUpdateArrayOrMap(ProcModelParser.UpdateArrayOrMapContext ctx);
+	T visitWriteIndexed(ProcModelParser.WriteIndexedContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ProcModelParser#expression}.
 	 * @param ctx the parse tree

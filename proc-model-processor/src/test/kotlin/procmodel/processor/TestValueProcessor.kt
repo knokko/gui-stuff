@@ -16,14 +16,14 @@ import procmodel.lang.instructions.PmInstruction.Companion.popScope
 import procmodel.lang.instructions.PmInstruction.Companion.pushScope
 import procmodel.lang.instructions.PmInstruction.Companion.pushValue
 import procmodel.lang.instructions.PmInstruction.Companion.pushVariable
-import procmodel.lang.instructions.PmInstruction.Companion.readListOrMap
+import procmodel.lang.instructions.PmInstruction.Companion.readIndexed
 import procmodel.lang.instructions.PmInstruction.Companion.reassignVariable
 import procmodel.lang.instructions.PmInstruction.Companion.setProperty
 import procmodel.lang.instructions.PmInstruction.Companion.smallerOrEqual
 import procmodel.lang.instructions.PmInstruction.Companion.smallerThan
 import procmodel.lang.instructions.PmInstruction.Companion.subtract
 import procmodel.lang.instructions.PmInstruction.Companion.swap
-import procmodel.lang.instructions.PmInstruction.Companion.updateListOrMap
+import procmodel.lang.instructions.PmInstruction.Companion.writeIndexed
 import procmodel.lang.types.*
 import procmodel.program.PmProgramBody
 
@@ -72,7 +72,7 @@ class TestValueProcessor {
 
             pushVariable("testList", 2),
             pushValue(PmInt(0), 2),
-            readListOrMap(2),
+            readIndexed(2),
             invokeBuiltinFunction("outputValue", 2),
             delete(2),
             exitProgram(3)
@@ -91,7 +91,7 @@ class TestValueProcessor {
             pushVariable("testList", 2),
             pushValue(PmInt(0), 2),
             pushValue(PmInt(22), 2),
-            updateListOrMap(2),
+            writeIndexed(2),
 
             pushVariable("testList", 3),
             invokeBuiltinFunction("outputValue", 3),

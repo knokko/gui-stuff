@@ -155,7 +155,6 @@ class SimpleFlatMenu(
 
     override fun processEvent(event: Event) {
         for (controller in controllers) {
-            // TODO Test this
             if (!controller.processLate) controller.processEvent(event)
         }
         updateComponentTree(true)
@@ -304,7 +303,6 @@ class SimpleFlatMenu(
 
         updateComponentTree(true)
         for (controller in controllers) {
-            // TODO Test this
             if (controller.processLate) controller.processEvent(event)
         }
         updateComponentTree(true)

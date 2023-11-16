@@ -3,8 +3,6 @@ package graviks.glfw
 import com.github.knokko.boiler.builder.BoilerBuilder
 import com.github.knokko.boiler.builder.BoilerBuilder.DEFAULT_VK_DEVICE_CREATOR
 import com.github.knokko.boiler.builder.BoilerSwapchainBuilder
-import com.github.knokko.boiler.builder.device.SimpleDeviceSelector
-import com.github.knokko.boiler.builder.instance.ValidationFeatures
 import com.github.knokko.boiler.builder.swapchain.SimpleSurfaceFormatPicker
 import com.github.knokko.boiler.exceptions.VulkanFailureException.assertVkSuccess
 import com.github.knokko.boiler.instance.BoilerInstance
@@ -29,12 +27,7 @@ import java.lang.System.nanoTime
 class GraviksWindow(
     initialWidth: Int,
     initialHeight: Int,
-    enableValidation: Boolean,
-    applicationName: String,
-    applicationVersion: Int,
-    preferPowerfulDevice: Boolean,
-    chainBoiler: (BoilerBuilder) -> BoilerBuilder = { it },
-    apiVersion: Int = 0,
+    builder: BoilerBuilder,
     private val createContext: (instance: GraviksInstance, width: Int, height: Int) -> GraviksContext
 ) {
 
@@ -48,30 +41,18 @@ class GraviksWindow(
     var currentGraviksContext: GraviksContext? = null
 
     init {
-        val deviceSelector = if (preferPowerfulDevice)
-            SimpleDeviceSelector(VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU, VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU)
-        else SimpleDeviceSelector(VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU, VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
-
-        val validationFeatures = if (enableValidation)
-            ValidationFeatures(false, false, false, true, true)
-        else null
-
         var canAwaitPresent = false
 
-        this.boiler = chainBoiler(BoilerBuilder(
-            apiVersion, applicationName, applicationVersion
-        )
+        this.boiler = builder
             .window(0L, initialWidth, initialHeight, BoilerSwapchainBuilder(
                 VK_IMAGE_USAGE_TRANSFER_DST_BIT
             ).surfaceFormatPicker(SimpleSurfaceFormatPicker(VK_FORMAT_B8G8R8A8_UNORM)))
-            .physicalDeviceSelector(deviceSelector)
             .desiredVkInstanceExtensions(listOf(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME))
             .desiredVkDeviceExtensions(listOf(
                 VK_KHR_INCREMENTAL_PRESENT_EXTENSION_NAME,
                 VK_KHR_PRESENT_WAIT_EXTENSION_NAME,
                 VK_KHR_PRESENT_ID_EXTENSION_NAME
             ))
-            .validation(validationFeatures)
             .vkDeviceCreator { stack, vkPhysicalDevice, deviceExtensions, ciDevice ->
                 if (deviceExtensions.contains(VK_KHR_PRESENT_WAIT_EXTENSION_NAME)) {
                     val presentWaitSupport = VkPhysicalDevicePresentWaitFeaturesKHR.calloc(stack)
@@ -98,7 +79,7 @@ class GraviksWindow(
                 }
                 DEFAULT_VK_DEVICE_CREATOR.vkCreateDevice(stack, vkPhysicalDevice, deviceExtensions, ciDevice)
             }
-        ).build()
+        .build()
 
         this.canAwaitPresent = canAwaitPresent
         this.hasIncrementalPresent = boiler.deviceExtensions.contains(VK_KHR_INCREMENTAL_PRESENT_EXTENSION_NAME)

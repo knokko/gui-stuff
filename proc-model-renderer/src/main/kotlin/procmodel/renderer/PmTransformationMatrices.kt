@@ -35,7 +35,7 @@ class PmTransformationMatrices<Matrix> internal constructor(
             }
 
             // TODO Potentially use storage buffer instead
-            // TODO Use device-local buffer instead
+            // OPTIMIZE Use device-local buffer instead
             matrixBuffer = boiler.buffers.createMapped(
                 requiredSize.toLong(), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, "PmMatrixBuffer"
             )

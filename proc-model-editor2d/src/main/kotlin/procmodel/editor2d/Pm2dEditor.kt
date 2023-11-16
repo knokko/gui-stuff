@@ -1,5 +1,7 @@
 package procmodel.editor2d
 
+import com.github.knokko.boiler.builder.BoilerBuilder
+import com.github.knokko.boiler.builder.instance.ValidationFeatures
 import com.github.knokko.boiler.instance.BoilerInstance
 import com.github.knokko.profiler.SampleProfiler
 import com.github.knokko.profiler.storage.SampleStorage
@@ -168,11 +170,12 @@ fun main() {
     val storage = SampleStorage.frequency()
     val profiler = SampleProfiler(storage)
     profiler.start()
-    // TODO Find a less dirty way to configure the boiler of GraviksWindow
+
+    val builder = BoilerBuilder(VK_API_VERSION_1_3, "Pm2Editor", 1)
+        .validation(ValidationFeatures(true, true, false, true, true))
+        .featurePicker13 { _, _, toEnable -> toEnable.dynamicRendering(true) }
     val graviksWindow = GraviksWindow(
-        1600, 900, true,
-        "Pm2Editor", VK_MAKE_VERSION(0, 1, 0), true,
-        { builder -> builder.featurePicker13 { _, _, toEnable -> toEnable.dynamicRendering(true) } }, VK_API_VERSION_1_3
+        1600, 900, builder
     ) { instance, width, height -> GraviksContext(instance, width, height) }
 
     createAndControlGruviksWindow(graviksWindow, createPm2Editor(graviksWindow.boiler))

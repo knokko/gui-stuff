@@ -15,7 +15,7 @@ class PmMeshes<Vertex> internal constructor(
     private val vertexInfo: PmVertexInfo<Vertex>
 ) {
     fun allocate(model: PmModel<Vertex>): PmMesh {
-        // TODO Buffer sub-allocation
+        // OPTIMIZE Buffer sub-allocation
         val vertexBuffer = boiler.buffers.createMapped(
             model.vertices.size * vertexInfo.byteSize.toLong(),
             VK10.VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, "PmMeshVertexBuffer"

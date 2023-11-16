@@ -1,5 +1,7 @@
 package playground
 
+import com.github.knokko.boiler.builder.BoilerBuilder
+import com.github.knokko.boiler.builder.instance.ValidationFeatures
 import graviks.glfw.GraviksWindow
 import graviks2d.context.GraviksContext
 import graviks2d.resource.text.TextStyle
@@ -15,7 +17,7 @@ import gruviks.space.Coordinate
 import gruviks.space.Point
 import gruviks.space.RectRegion
 import gruviks.space.SpaceLayout
-import org.lwjgl.vulkan.VK10.VK_MAKE_VERSION
+import org.lwjgl.vulkan.VK10.VK_API_VERSION_1_0
 import java.lang.Integer.parseInt
 
 private val nameStyle = TextStyle(
@@ -127,8 +129,9 @@ private fun createMenu(): Component {
 
 fun main() {
     val graviksWindow = GraviksWindow(
-            1200, 900, true, "ListControllerPlayground",
-            VK_MAKE_VERSION(0, 1, 0), false
+            1200, 900,
+        BoilerBuilder(VK_API_VERSION_1_0, "ListControllerPlayground", 1)
+            .validation(ValidationFeatures(false, false, false, true, true))
     ) { instance, width, height -> GraviksContext(instance, width, height) }
 
     createAndControlGruviksWindow(graviksWindow, createMenu())

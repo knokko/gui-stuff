@@ -1,13 +1,11 @@
 package graviks2d.pipeline.text
 
-import com.github.knokko.boiler.exceptions.VulkanFailureException.assertVkSuccess
 import com.github.knokko.boiler.instance.BoilerInstance
 import com.github.knokko.boiler.pipelines.GraphicsPipelineBuilder
 import com.github.knokko.boiler.pipelines.ShaderInfo
 import org.lwjgl.system.MemoryStack.stackPush
 import org.lwjgl.vulkan.VK10.*
 import org.lwjgl.vulkan.VkDescriptorSetLayoutBinding
-import org.lwjgl.vulkan.VkGraphicsPipelineCreateInfo
 
 const val TEXT_COLOR_FORMAT = VK_FORMAT_R8_UNORM
 
@@ -22,7 +20,6 @@ internal class TextPipeline(
     val vkRenderPass: Long
 
     init {
-        // TODO Pipeline cache
         stackPush().use { stack ->
 
             val oddLayoutBindings = VkDescriptorSetLayoutBinding.calloc(1, stack)
@@ -45,18 +42,15 @@ internal class TextPipeline(
                 stack, "graviks2d/shaders/textCount.frag.spv", "TextCountFragment"
             )
 
-            val ciPipelines = VkGraphicsPipelineCreateInfo.calloc(2, stack)
-            val ciCountPipeline = ciPipelines[0]
-            val countPipelineBuilder = GraphicsPipelineBuilder(ciCountPipeline, boiler, stack)
+            val countPipelineBuilder = GraphicsPipelineBuilder(boiler, stack)
 
             // Note: the following is shared with the regular graviks pipeline:
             // inputAssembly, viewportState, dynamicState, rasterizationState
-            ciCountPipeline.`sType$Default`()
             countPipelineBuilder.shaderStages(
                 ShaderInfo(VK_SHADER_STAGE_VERTEX_BIT, textCountVertexShader, null),
                 ShaderInfo(VK_SHADER_STAGE_FRAGMENT_BIT, textCountFragmentShader, null)
             )
-            ciCountPipeline.pVertexInputState(createTextCountPipelineVertexInput(stack))
+            countPipelineBuilder.ciPipeline.pVertexInputState(createTextCountPipelineVertexInput(stack))
             countPipelineBuilder.simpleInputAssembly()
             countPipelineBuilder.dynamicViewports(1)
             countPipelineBuilder.dynamicStates(
@@ -66,10 +60,10 @@ internal class TextPipeline(
             // Note: instead of using multisampling, the text renderer simply claims bigger space for some characters and
             // downscales them when drawing
             countPipelineBuilder.noMultisampling()
-            ciCountPipeline.pColorBlendState(createTextCountPipelineColorBlend(stack))
-            ciCountPipeline.layout(this.countPipelineLayout)
-            ciCountPipeline.renderPass(vkRenderPass)
-            ciCountPipeline.subpass(0)
+            countPipelineBuilder.ciPipeline.pColorBlendState(createTextCountPipelineColorBlend(stack))
+            countPipelineBuilder.ciPipeline.layout(this.countPipelineLayout)
+            countPipelineBuilder.ciPipeline.renderPass(vkRenderPass)
+            countPipelineBuilder.ciPipeline.subpass(0)
 
             val textOddVertexShader = boiler.pipelines.createShaderModule(
                 stack, "graviks2d/shaders/textOdd.vert.spv", "TextOddVertex"
@@ -78,14 +72,12 @@ internal class TextPipeline(
                 stack, "graviks2d/shaders/textOdd.frag.spv", "TextOddFragment"
             )
 
-            val ciOddPipeline = ciPipelines[1]
-            val oddPipelineBuilder = GraphicsPipelineBuilder(ciOddPipeline, boiler, stack)
-            ciOddPipeline.`sType$Default`()
+            val oddPipelineBuilder = GraphicsPipelineBuilder(boiler, stack)
             oddPipelineBuilder.shaderStages(
                 ShaderInfo(VK_SHADER_STAGE_VERTEX_BIT, textOddVertexShader, null),
                 ShaderInfo(VK_SHADER_STAGE_FRAGMENT_BIT, textOddFragmentShader, null)
             )
-            ciOddPipeline.pVertexInputState(createTextOddPipelineVertexInput(stack))
+            oddPipelineBuilder.ciPipeline.pVertexInputState(createTextOddPipelineVertexInput(stack))
             oddPipelineBuilder.simpleInputAssembly()
             oddPipelineBuilder.dynamicViewports(1)
             oddPipelineBuilder.dynamicStates(
@@ -93,18 +85,13 @@ internal class TextPipeline(
             )
             oddPipelineBuilder.simpleRasterization(VK_CULL_MODE_NONE)
             oddPipelineBuilder.noMultisampling()
-            ciOddPipeline.pColorBlendState(createTextOddPipelineColorBlend(stack))
-            ciOddPipeline.layout(this.oddPipelineLayout)
-            ciOddPipeline.renderPass(this.vkRenderPass)
-            ciOddPipeline.subpass(1)
+            oddPipelineBuilder.ciPipeline.pColorBlendState(createTextOddPipelineColorBlend(stack))
+            oddPipelineBuilder.ciPipeline.layout(this.oddPipelineLayout)
+            oddPipelineBuilder.ciPipeline.renderPass(this.vkRenderPass)
+            oddPipelineBuilder.ciPipeline.subpass(1)
 
-            val pPipelines = stack.callocLong(2)
-            assertVkSuccess(
-                vkCreateGraphicsPipelines(boiler.vkDevice(), VK_NULL_HANDLE, ciPipelines, null, pPipelines),
-                "vkCreateGraphicsPipeline", "GraviksTextPipeline"
-            )
-            this.countPipeline = pPipelines[0]
-            this.oddPipeline = pPipelines[1]
+            this.countPipeline = countPipelineBuilder.build("TextCountPipeline")
+            this.oddPipeline = oddPipelineBuilder.build("TextOddPipeline")
 
             vkDestroyShaderModule(boiler.vkDevice(), textCountVertexShader, null)
             vkDestroyShaderModule(boiler.vkDevice(), textCountFragmentShader, null)

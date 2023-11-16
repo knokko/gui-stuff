@@ -17,7 +17,7 @@ object PmTestCase {
         PmInstruction.pushVariable("triangleParameters", 9), // index 2
         PmInstruction.pushValue(PmString("color"), 9), // index 3
         PmInstruction.pushVariable("ownColor", 9), // index 4
-        PmInstruction.updateListOrMap(9), // index 5
+        PmInstruction.writeIndexed(9), // index 5
         PmInstruction.pushValue(PmInt(0), 11), // index 6
         PmInstruction.createDynamicMatrix(11), // index 7
         PmInstruction.declareVariable("bigMatrix", PmBuiltinTypes.MATRIX_INDEX, 11), // index 8
@@ -30,25 +30,25 @@ object PmTestCase {
         PmInstruction.pushVariable("nestedParameters", 20), // index 15
         PmInstruction.pushValue(PmString("offsetX"), 20), // index 16
         PmInstruction.pushValue(PmFloat(0.2f), 20), // index 17
-        PmInstruction.updateListOrMap(20), // index 18
+        PmInstruction.writeIndexed(20), // index 18
         PmInstruction.pushVariable("nestedParameters", 21), // index 19
         PmInstruction.pushValue(PmString("offsetY"), 21), // index 20
         PmInstruction.pushValue(PmFloat(-0.3f), 21), // index 21
-        PmInstruction.updateListOrMap(21), // index 22
+        PmInstruction.writeIndexed(21), // index 22
         PmInstruction.pushVariable("nestedParameters", 22), // index 23
         PmInstruction.pushValue(PmString("color1"), 22), // index 24
         PmInstruction.pushValue(PmFloat(1.0f), 22), // index 25
         PmInstruction.pushValue(PmFloat(0.0f), 22), // index 26
         PmInstruction.pushValue(PmFloat(0.0f), 22), // index 27
         PmInstruction.invokeBuiltinFunction("rgb", 22), // index 28
-        PmInstruction.updateListOrMap(22), // index 29
+        PmInstruction.writeIndexed(22), // index 29
         PmInstruction.pushVariable("nestedParameters", 23), // index 30
         PmInstruction.pushValue(PmString("color2"), 23), // index 31
         PmInstruction.pushValue(PmFloat(0.0f), 23), // index 32
         PmInstruction.pushValue(PmFloat(1.0f), 23), // index 33
         PmInstruction.pushValue(PmFloat(0.0f), 23), // index 34
         PmInstruction.invokeBuiltinFunction("rgb", 23), // index 35
-        PmInstruction.updateListOrMap(23), // index 36
+        PmInstruction.writeIndexed(23), // index 36
         PmInstruction.pushValue(PmInt(1), 25), // index 37
         PmInstruction.createDynamicMatrix(25), // index 38
         PmInstruction.declareVariable("smallMatrix", PmBuiltinTypes.MATRIX_INDEX, 25), // index 39
@@ -64,13 +64,13 @@ object PmTestCase {
         PmInstruction.pushVariable("childParameters1", 11), // index 46
         PmInstruction.pushValue(PmString("color"), 11), // index 47
         PmInstruction.pushVariable("color1", 11), // index 48
-        PmInstruction.updateListOrMap(11), // index 49
+        PmInstruction.writeIndexed(11), // index 49
         PmInstruction.pushValue(PmMap(), 13), // index 50
         PmInstruction.declareVariable("childParameters2", PmBuiltinTypes.MAP, 13), // index 51
         PmInstruction.pushVariable("childParameters2", 14), // index 52
         PmInstruction.pushValue(PmString("color"), 14), // index 53
         PmInstruction.pushVariable("color2", 14), // index 54
-        PmInstruction.updateListOrMap(14), // index 55
+        PmInstruction.writeIndexed(14), // index 55
         PmInstruction.transferVariable("offsetX", PmBuiltinTypes.FLOAT, 16), // index 56
         PmInstruction.transferVariable("offsetY", PmBuiltinTypes.FLOAT, 16), // index 57
         PmInstruction.pushValue(PmInt(2), 16), // index 58
@@ -200,7 +200,7 @@ object PmTestCase {
             PmInstruction.pushVariable("parameters", 32),
             PmInstruction.pushValue(PmString("distance"), 32),
             PmInstruction.pushVariable("passDistance", 32),
-            PmInstruction.updateListOrMap(32),
+            PmInstruction.writeIndexed(32),
             PmInstruction.pushVariable("parameters", 33),
             PmInstruction.invokeBuiltinFunction("outputValue", 33),
             PmInstruction.delete(33),

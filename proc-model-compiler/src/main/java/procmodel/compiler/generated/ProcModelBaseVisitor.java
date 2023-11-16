@@ -165,14 +165,14 @@ public class ProcModelBaseVisitor<T> extends AbstractParseTreeVisitor<T> impleme
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitReadArrayOrMap(ProcModelParser.ReadArrayOrMapContext ctx) { return visitChildren(ctx); }
+	@Override public T visitReadIndexed(ProcModelParser.ReadIndexedContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitUpdateArrayOrMap(ProcModelParser.UpdateArrayOrMapContext ctx) { return visitChildren(ctx); }
+	@Override public T visitWriteIndexed(ProcModelParser.WriteIndexedContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

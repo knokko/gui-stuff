@@ -37,7 +37,7 @@ class PmInstruction private constructor(
             PmInstructionType.PushValue -> "pushValue($value, $lineNumber)"
             PmInstructionType.PushVariable -> "pushVariable($name, $lineNumber)"
             PmInstructionType.PushProperty -> "pushProperty($name, $lineNumber)"
-            PmInstructionType.ReadListOrMap -> "readListOrMap($lineNumber)"
+            PmInstructionType.ReadIndexed -> "readListOrMap($lineNumber)"
             PmInstructionType.Divide -> "divide($lineNumber)"
             PmInstructionType.Multiply -> "multiply($lineNumber)"
             PmInstructionType.Add -> "add($lineNumber)"
@@ -50,7 +50,7 @@ class PmInstruction private constructor(
             PmInstructionType.DeclareVariable -> "declareVariable($name, $variableType, $lineNumber)"
             PmInstructionType.ReassignVariable -> "reassignVariable($name, $lineNumber)"
             PmInstructionType.SetProperty -> "setProperty($name, $lineNumber)"
-            PmInstructionType.UpdateListOrMap -> "updateListOrMap($lineNumber)"
+            PmInstructionType.WriteIndexed -> "updateListOrMap($lineNumber)"
             PmInstructionType.Jump -> "jump($lineNumber)"
             PmInstructionType.InvokeBuiltinFunction -> "invokeBuiltinFunction($name, $lineNumber)"
             PmInstructionType.TransferVariable -> "transferVariable($name, $variableType, $lineNumber)"
@@ -84,8 +84,7 @@ class PmInstruction private constructor(
 
         fun pushProperty(name: String, lineNumber: Int) = named(PmInstructionType.PushProperty, name, lineNumber)
 
-        // TODO Find a better name for this
-        fun readListOrMap(lineNumber: Int) = PmInstruction(PmInstructionType.ReadListOrMap, lineNumber)
+        fun readIndexed(lineNumber: Int) = PmInstruction(PmInstructionType.ReadIndexed, lineNumber)
 
         fun divide(lineNumber: Int) = PmInstruction(PmInstructionType.Divide, lineNumber)
 
@@ -113,8 +112,7 @@ class PmInstruction private constructor(
 
         fun setProperty(name: String, lineNumber: Int) = named(PmInstructionType.SetProperty, name, lineNumber)
 
-        // TODO Find a better name for this
-        fun updateListOrMap(lineNumber: Int) = PmInstruction(PmInstructionType.UpdateListOrMap, lineNumber)
+        fun writeIndexed(lineNumber: Int) = PmInstruction(PmInstructionType.WriteIndexed, lineNumber)
 
         fun jump(lineNumber: Int) = PmInstruction(PmInstructionType.Jump, lineNumber)
 

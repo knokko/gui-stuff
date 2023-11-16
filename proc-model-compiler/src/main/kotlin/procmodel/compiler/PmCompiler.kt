@@ -406,8 +406,8 @@ class PmCompiler<VertexValue : PmValue>(
         }
     }
 
-    override fun exitUpdateArrayOrMap(ctx: ProcModelParser.UpdateArrayOrMapContext?) {
-        instructions.add(PmInstruction.updateListOrMap(ctx!!.start.line))
+    override fun exitWriteIndexed(ctx: ProcModelParser.WriteIndexedContext?) {
+        instructions.add(PmInstruction.writeIndexed(ctx!!.start.line))
     }
 
     override fun exitVariableReassignment(ctx: ProcModelParser.VariableReassignmentContext?) {

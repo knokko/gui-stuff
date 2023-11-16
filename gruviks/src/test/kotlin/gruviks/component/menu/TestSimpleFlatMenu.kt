@@ -6,7 +6,10 @@ import graviks2d.util.Color
 import gruviks.component.*
 import gruviks.component.agent.*
 import gruviks.component.fill.SimpleColorFillComponent
+import gruviks.component.menu.controller.SimpleFlatController
 import gruviks.component.test.ColorShuffleComponent
+import gruviks.component.text.TextButton
+import gruviks.component.text.TextButtonStyle
 import gruviks.event.*
 import gruviks.feedback.*
 import gruviks.space.Coordinate
@@ -1341,5 +1344,34 @@ class TestSimpleFlatMenu {
         assertEquals(1, target.fillRectCounter)
         assertNull(renderResult2.drawnRegion)
         assertNull(renderResult3.recentDrawnRegion)
+    }
+
+    @Test
+    fun testProcessLateController() {
+        val menu = SimpleFlatMenu(SpaceLayout.Simple, Color.BLACK)
+        menu.initAgent(ComponentAgent(DummyCursorTracker(), DUMMY_FEEDBACK) { false })
+        menu.subscribeToEvents()
+
+        var testCounter = 0
+
+        class TestController(val expectedValue: Int, delayed: Boolean) : SimpleFlatController(delayed) {
+            override fun processEvent(event: Event) {
+                assertEquals(expectedValue, testCounter)
+                testCounter += 1
+            }
+        }
+
+        menu.addController(TestController(2, true))
+        menu.addComponent(TextButton("Hey you", null, TextButtonStyle.textAndBorder(
+            Color.BLACK, Color.BLUE
+        )) { _, _ ->
+            assertEquals(1, testCounter)
+            testCounter += 1
+        }, RectRegion.percentage(20, 20, 80, 80))
+        menu.addController(TestController(0, false))
+
+        menu.render(DummyGraviksTarget(), false)
+        menu.processEvent(CursorClickEvent(Cursor(0), EventPosition(0.5f, 0.5f), 0))
+        assertEquals(3, testCounter)
     }
 }

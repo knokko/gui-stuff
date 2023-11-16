@@ -68,7 +68,7 @@ abstract class PmProcessor(
                 variables.getVariable(instruction.name!!) ?: throw PmRuntimeError("Undefined variable ${instruction.name}")
             )
             PmInstructionType.PushProperty -> valueStack.add(valueStack.removeLast().getProperty(instruction.name!!))
-            PmInstructionType.ReadListOrMap -> {
+            PmInstructionType.ReadIndexed -> {
                 val key = valueStack.removeLast()
                 val map = valueStack.removeLast()
                 valueStack.add(map[key])
@@ -103,7 +103,7 @@ abstract class PmProcessor(
                 val newValue = valueStack.removeLast()
                 valueStack.removeLast().setProperty(instruction.name!!, newValue)
             }
-            PmInstructionType.UpdateListOrMap -> {
+            PmInstructionType.WriteIndexed -> {
                 val value = valueStack.removeLast()
                 val key = valueStack.removeLast()
                 val map = valueStack.removeLast()

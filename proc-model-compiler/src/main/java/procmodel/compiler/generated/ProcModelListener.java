@@ -218,25 +218,25 @@ public interface ProcModelListener extends ParseTreeListener {
 	 */
 	void exitFunctionInvocation(ProcModelParser.FunctionInvocationContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ProcModelParser#readArrayOrMap}.
+	 * Enter a parse tree produced by {@link ProcModelParser#readIndexed}.
 	 * @param ctx the parse tree
 	 */
-	void enterReadArrayOrMap(ProcModelParser.ReadArrayOrMapContext ctx);
+	void enterReadIndexed(ProcModelParser.ReadIndexedContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ProcModelParser#readArrayOrMap}.
+	 * Exit a parse tree produced by {@link ProcModelParser#readIndexed}.
 	 * @param ctx the parse tree
 	 */
-	void exitReadArrayOrMap(ProcModelParser.ReadArrayOrMapContext ctx);
+	void exitReadIndexed(ProcModelParser.ReadIndexedContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ProcModelParser#updateArrayOrMap}.
+	 * Enter a parse tree produced by {@link ProcModelParser#writeIndexed}.
 	 * @param ctx the parse tree
 	 */
-	void enterUpdateArrayOrMap(ProcModelParser.UpdateArrayOrMapContext ctx);
+	void enterWriteIndexed(ProcModelParser.WriteIndexedContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ProcModelParser#updateArrayOrMap}.
+	 * Exit a parse tree produced by {@link ProcModelParser#writeIndexed}.
 	 * @param ctx the parse tree
 	 */
-	void exitUpdateArrayOrMap(ProcModelParser.UpdateArrayOrMapContext ctx);
+	void exitWriteIndexed(ProcModelParser.WriteIndexedContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link ProcModelParser#expression}.
 	 * @param ctx the parse tree

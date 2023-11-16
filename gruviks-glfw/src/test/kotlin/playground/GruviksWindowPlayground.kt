@@ -1,5 +1,7 @@
 package playground
 
+import com.github.knokko.boiler.builder.BoilerBuilder
+import com.github.knokko.boiler.builder.instance.ValidationFeatures
 import com.github.knokko.memory.MemorySnapshot
 import com.github.knokko.profiler.SampleProfiler
 import com.github.knokko.profiler.storage.SampleStorage
@@ -22,7 +24,7 @@ import gruviks.glfw.createAndControlGruviksWindow
 import gruviks.space.Coordinate
 import gruviks.space.RectRegion
 import gruviks.space.SpaceLayout
-import org.lwjgl.vulkan.VK10.VK_MAKE_VERSION
+import org.lwjgl.vulkan.VK12.VK_API_VERSION_1_2
 import java.io.File
 import java.io.PrintWriter
 import java.util.function.Predicate
@@ -154,8 +156,9 @@ fun main() {
     profiler.start()
 
     val graviksWindow = GraviksWindow(
-        1000, 800, true, "Gruviks Tester",
-        VK_MAKE_VERSION(0, 1, 0), true
+        1000, 800,
+        BoilerBuilder(VK_API_VERSION_1_2, "GruviksWindowPlayground", 1)
+            .validation(ValidationFeatures(true, true,false, true, true))
     ) { instance, width, height ->
         GraviksContext(instance, width, height)
     }

@@ -5,7 +5,7 @@ enum class PmInstructionType {
     PushValue,
     PushVariable,
     PushProperty,
-    ReadListOrMap,
+    ReadIndexed,
 
     Divide,
     Multiply,
@@ -22,7 +22,7 @@ enum class PmInstructionType {
     DeclareVariable,
     ReassignVariable,
     SetProperty,
-    UpdateListOrMap,
+    WriteIndexed,
 
     Jump,
     InvokeBuiltinFunction,

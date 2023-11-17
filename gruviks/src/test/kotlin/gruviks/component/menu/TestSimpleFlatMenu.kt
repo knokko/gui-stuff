@@ -891,6 +891,74 @@ class TestSimpleFlatMenu {
     }
 
     @Test
+    fun testReplaceMeFeedback() {
+        val menu = SimpleFlatMenu(SpaceLayout.Simple, Color.WHITE)
+        menu.initAgent(ComponentAgent(DummyCursorTracker(), DUMMY_FEEDBACK, NO_KEYBOARD_FOCUS))
+        menu.subscribeToEvents()
+
+        class TurquoiseComponent : Component() {
+
+            var isBlue = false
+
+            override fun subscribeToEvents() {
+                agent.subscribe(CursorClickEvent::class)
+            }
+
+            override fun processEvent(event: Event) {
+                isBlue = true
+                agent.giveFeedback(RenderFeedback())
+            }
+
+            override fun render(target: GraviksTarget, force: Boolean): RenderResult {
+                if (isBlue) target.fillRect(0f, 0f, 1f, 1f, Color.BLUE)
+                else target.fillRect(0f, 0f, 1f, 1f, Color.GREEN)
+                return RenderResult(
+                    drawnRegion = RectangularDrawnRegion(0f, 0f, 1f, 1f),
+                    propagateMissedCursorEvents = true
+                )
+            }
+        }
+
+        class RedComponent : Component() {
+            override fun subscribeToEvents() {
+                agent.subscribe(CursorClickEvent::class)
+            }
+
+            override fun processEvent(event: Event) {
+                agent.giveFeedback(ReplaceMeFeedback { TurquoiseComponent() })
+            }
+
+            override fun render(target: GraviksTarget, force: Boolean): RenderResult {
+                target.fillRect(0f, 0f, 1f, 1f, Color.RED)
+                return RenderResult(
+                    drawnRegion = RectangularDrawnRegion(0f, 0f, 1f, 1f),
+                    propagateMissedCursorEvents = true
+                )
+            }
+        }
+
+        val scissor = GraviksScissor(0.4f, 0.5f, 0.6f, 0.7f)
+        val redDraw = FillRectCall(0.4f, 0.5f, 0.6f, 0.7f, Color.RED, scissor)
+        val greenDraw = FillRectCall(0.4f, 0.5f, 0.6f, 0.7f, Color.GREEN, scissor)
+        val blueDraw = FillRectCall(0.4f, 0.5f, 0.6f, 0.7f, Color.BLUE, scissor)
+
+        val target = LoggedGraviksTarget()
+
+        menu.addComponent(RedComponent(), RectRegion.percentage(40, 50, 60, 70))
+        menu.render(target, false)
+
+        assertTrue(target.fillRectCalls.contains(redDraw))
+
+        menu.processEvent(CursorClickEvent(Cursor(0), EventPosition(0.5f, 0.6f), 0))
+        menu.render(target, false)
+
+        assertTrue(target.fillRectCalls.contains(greenDraw))
+        menu.processEvent(CursorClickEvent(Cursor(0), EventPosition(0.5f, 0.6f), 0))
+        menu.render(target, false)
+        assertTrue(target.fillRectCalls.contains(blueDraw))
+    }
+
+    @Test
     fun testKeyboardFeedback() {
         class KeyComponent : Component() {
 

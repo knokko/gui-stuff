@@ -111,6 +111,10 @@ private fun createTitleScreen(): SimpleFlatMenu {
         giveFeedback(AddressedFeedback(null, ExitFeedback()))
     }, RectRegion.percentage(20, 7, 80, 17))
 
+    menu.addComponent(TextButton("Switch me", null, baseButtonStyle) { _, giveFeedback ->
+        giveFeedback(ReplaceMeFeedback { DiscoComponent() })
+    }, RectRegion.percentage(10, 30, 20, 40))
+
     menu.addComponent(DiscoComponent(), RectRegion.percentage(10, 80, 20, 90))
     menu.addComponent(DiscoComponent(), RectRegion.percentage(10, 60, 20, 70))
     menu.addComponent(DiscoComponent(), RectRegion.percentage(80, 80, 90, 90))

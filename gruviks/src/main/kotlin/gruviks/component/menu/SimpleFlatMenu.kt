@@ -184,7 +184,6 @@ class SimpleFlatMenu(
                 }
             }
         } else if (event is CursorMoveEvent) {
-            // TODO Maybe remember old mouse position to avoid potential precision issues
             val (oldX, oldY) = visibleRegion.transform(event.oldPosition.x, event.oldPosition.y)
             val (newX, newY) = visibleRegion.transform(event.newPosition.x, event.newPosition.y)
 
@@ -498,8 +497,11 @@ class SimpleFlatMenu(
             } else if (feedback is MoveCameraFeedback) {
                 moveCamera(feedback.newPosition)
             } else if (feedback is ReplaceYouFeedback) {
-                // TODO Add support for ReplaceMeFeedback
                 agent.giveFeedback(ReplaceMeFeedback(feedback.createReplacement))
+            } else if (feedback is ReplaceMeFeedback) {
+                val region = node.region
+                removeComponent(node.component.id)
+                addComponent(feedback.createReplacement(), region)
             } else {
                 throw UnsupportedOperationException("Unexpected feedback $feedback")
             }

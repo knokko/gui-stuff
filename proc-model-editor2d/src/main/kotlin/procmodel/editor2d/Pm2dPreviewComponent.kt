@@ -145,10 +145,14 @@ class Pm2PreviewComponent(
             try {
                 if (shouldAwaitFence) boiler.sync.waitAndReset(stack, previewFence, 1_000_000_000L)
 
-                if (!this::previewImage.isInitialized) {
-                    // TODO Query target size?
+                val (width, height) = target.getSize()
+                if (!this::previewImage.isInitialized || width != previewImage.width || height != previewImage.height) {
+                    if (this::previewImage.isInitialized) {
+                        vkDestroyImageView(boiler.vkDevice(), previewImage.vkImageView, null)
+                        vmaDestroyImage(boiler.vmaAllocator(), previewImage.vkImage, previewImage.vmaAllocation)
+                    }
                     previewImage = boiler.images.createSimple(
-                        stack, 500, 500, VK_FORMAT_R8G8B8A8_SRGB,
+                        stack, width, height, VK_FORMAT_R8G8B8A8_SRGB,
                         VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT or VK_IMAGE_USAGE_SAMPLED_BIT,
                         VK_IMAGE_ASPECT_COLOR_BIT, "Pm2dPreview"
                     )

@@ -122,6 +122,16 @@ class TestChildTarget {
     }
 
     @Test
+    fun testGetSize() {
+        val parent = LoggedTarget(400, 800)
+
+        val child = ChildTarget(parent, 0.2f, 0.5f, 0.7f, 0.75f)
+        val (width, height) = child.getSize()
+        assertEquals(200, width)
+        assertEquals(200, height)
+    }
+
+    @Test
     fun testGetStringAspectRatio() {
         val parent = LoggedTarget()
         val child = ChildTarget(parent, 0.1f, 0.3f, 0.3f, 0.4f)
@@ -138,7 +148,7 @@ class TestChildTarget {
     }
 }
 
-private class LoggedTarget : GraviksTarget {
+private class LoggedTarget(val width: Int = 1500, val height: Int = 1000) : GraviksTarget {
 
     var x1 = 0f
     var y1 = 0f
@@ -156,6 +166,8 @@ private class LoggedTarget : GraviksTarget {
     }
 
     override fun getScissor() = this.currentScissor
+
+    override fun getSize() = Pair(width, height)
 
     override fun fillTriangle(x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float, color: Color) {
         this.x1 = x1

@@ -177,6 +177,7 @@ class GraviksContext(
     }
 
     override fun getScissor() = this.currentScissor
+    override fun getSize() = Pair(width, height)
 
     private fun claimNextVertexIndex(numVertices: Int): Pair<Int, Boolean> {
         var didHardFlush = false

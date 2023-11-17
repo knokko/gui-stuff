@@ -24,6 +24,7 @@ class LoggedGraviksTarget: GraviksTarget {
     }
 
     override fun getScissor() = currentScissor
+    override fun getSize() = Pair(100, 100)
 
     override fun fillTriangle(x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float, color: Color) {
         throw UnsupportedOperationException()

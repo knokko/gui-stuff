@@ -5,6 +5,7 @@ import graviks2d.resource.text.CharacterPosition
 import graviks2d.resource.text.FontReference
 import graviks2d.resource.text.TextStyle
 import graviks2d.util.Color
+import kotlin.math.roundToInt
 
 class ChildTarget(
     private val parent: GraviksTarget,
@@ -42,6 +43,11 @@ class ChildTarget(
         return transformBack(scissor.minX, scissor.minY, scissor.maxX, scissor.maxY) { tx1, ty1, tx2, ty2 ->
             GraviksScissor(tx1, ty1, tx2, ty2)
         }
+    }
+
+    override fun getSize(): Pair<Int, Int> {
+        val (parentWidth, parentHeight) = parent.getSize()
+        return Pair((parentWidth * (maxX - minX)).roundToInt(), (parentHeight * (maxY - minY)).roundToInt())
     }
 
     override fun fillTriangle(x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float, color: Color) {

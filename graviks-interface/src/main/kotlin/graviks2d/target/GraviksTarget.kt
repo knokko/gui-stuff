@@ -11,6 +11,12 @@ interface GraviksTarget {
 
     fun getScissor(): GraviksScissor
 
+    /**
+     * Gets the size of this render target, in pixels. The first element of the returned `Pair` is the width and the
+     * second element is the height.
+     */
+    fun getSize(): Pair<Int, Int>
+
     fun fillTriangle(x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float, color: Color)
 
     fun fillRect(x1: Float, y1: Float, x2: Float, y2: Float, color: Color)

@@ -167,4 +167,21 @@ class TestTreeViewController {
         menu.render(target, false)
         assertEquals(1, menu.getComponentIDs().size)
     }
+
+    @Test
+    fun testGetNodeChild() {
+        val rootNode = TreeViewController.Node(12, mutableListOf(
+            TreeViewController.Node(3, mutableListOf(
+                TreeViewController.Node(5, mutableListOf()),
+                TreeViewController.Node(6, mutableListOf())
+            )),
+            TreeViewController.Node(7, mutableListOf())
+        ))
+
+        assertEquals(12, rootNode.getChild(emptyList()).element)
+        assertEquals(3, rootNode.getChild(listOf(0)).element)
+        assertEquals(5, rootNode.getChild(listOf(0, 0)).element)
+        assertEquals(6, rootNode.getChild(listOf(0, 1)).element)
+        assertEquals(7, rootNode.getChild(listOf(1)).element)
+    }
 }

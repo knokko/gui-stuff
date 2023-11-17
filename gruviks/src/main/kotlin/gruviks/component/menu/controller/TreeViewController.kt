@@ -123,7 +123,6 @@ class TreeViewController<T>(
     }
 
     class Node<T>(var element: T, var children: MutableList<Node<T>>?) {
-        // TODO Test this
         fun getChild(indices: List<Int>): Node<T> {
             var node = this
             for (index in indices) {

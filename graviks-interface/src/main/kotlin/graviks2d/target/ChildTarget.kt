@@ -1,6 +1,5 @@
 package graviks2d.target
 
-import com.github.knokko.boiler.sync.WaitSemaphore
 import graviks2d.resource.image.ImageReference
 import graviks2d.resource.text.CharacterPosition
 import graviks2d.resource.text.FontReference
@@ -95,8 +94,8 @@ class ChildTarget(
         }
     }
 
-    override fun addWaitSemaphore(semaphore: WaitSemaphore) {
-        this.parent.addWaitSemaphore(semaphore)
+    override fun addWaitSemaphore(vkSemaphore: Long, dstStageMask: Int) {
+        this.parent.addWaitSemaphore(vkSemaphore, dstStageMask)
     }
 
     override fun getImageSize(image: ImageReference) = parent.getImageSize(image)

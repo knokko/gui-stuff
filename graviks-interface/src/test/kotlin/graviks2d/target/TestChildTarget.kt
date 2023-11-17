@@ -1,12 +1,9 @@
-package graviks2d
+package graviks2d.target
 
 import graviks2d.resource.image.ImageReference
 import graviks2d.resource.text.CharacterPosition
 import graviks2d.resource.text.FontReference
 import graviks2d.resource.text.TextStyle
-import graviks2d.target.ChildTarget
-import graviks2d.target.GraviksScissor
-import graviks2d.target.GraviksTarget
 import graviks2d.util.Color
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue

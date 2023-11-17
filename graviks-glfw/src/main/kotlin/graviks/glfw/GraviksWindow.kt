@@ -7,7 +7,6 @@ import com.github.knokko.boiler.builder.swapchain.SimpleSurfaceFormatPicker
 import com.github.knokko.boiler.exceptions.VulkanFailureException.assertVkSuccess
 import com.github.knokko.boiler.instance.BoilerInstance
 import com.github.knokko.boiler.sync.ResourceUsage
-import com.github.knokko.boiler.sync.WaitSemaphore
 import graviks2d.context.GraviksContext
 import graviks2d.core.GraviksInstance
 import org.lwjgl.system.MemoryStack
@@ -118,7 +117,7 @@ class GraviksWindow(
 
         stackPush().use { stack ->
 
-            graviksContext.addWaitSemaphore(WaitSemaphore(swapchainImage.acquireSemaphore, VK_PIPELINE_STAGE_TRANSFER_BIT))
+            graviksContext.addWaitSemaphore(swapchainImage.acquireSemaphore, VK_PIPELINE_STAGE_TRANSFER_BIT)
             graviksContext.copyColorImageTo(
                 destImage = swapchainImage.vkImage, destImageFormat = boiler.swapchainSettings.surfaceFormat.format,
                 destBuffer = null, signalSemaphore = swapchainImage.presentSemaphore,

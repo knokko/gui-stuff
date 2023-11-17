@@ -3,10 +3,10 @@ package graviks2d.resource.text
 import java.io.File
 
 class FontReference private constructor(
-    internal val file: File?,
-    internal val classLoaderPath: String?
+    val file: File?,
+    val classLoaderPath: String?
 ) {
-    internal val id: String
+    val id: String
     get() {
         return if (this.file != null) "file:${file.absolutePath}"
         else "classpath:${classLoaderPath!!}"

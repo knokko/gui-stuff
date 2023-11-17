@@ -435,8 +435,8 @@ class GraviksContext(
         drawImage(xLeft, yBottom, xRight, yTop, imageIndex)
     }
 
-    override fun addWaitSemaphore(semaphore: WaitSemaphore) {
-        this.commands.addWaitSemaphore(semaphore)
+    override fun addWaitSemaphore(vkSemaphore: Long, dstStageMask: Int) {
+        this.commands.addWaitSemaphore(WaitSemaphore(vkSemaphore, dstStageMask))
     }
 
     override fun getImageSize(image: ImageReference): Pair<Int, Int> {

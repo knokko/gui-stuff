@@ -3,9 +3,9 @@ package graviks2d.resource.image
 import java.io.File
 
 class ImageReference private constructor(
-    internal val isSvg: Boolean,
-    internal val path: String?,
-    internal val file: File?
+    val isSvg: Boolean,
+    val path: String?,
+    val file: File?
 ) {
 
     init {

@@ -6,7 +6,6 @@ import com.github.knokko.boiler.images.VmaImage
 import com.github.knokko.boiler.instance.BoilerInstance
 import com.github.knokko.boiler.pipelines.GraphicsPipelineBuilder
 import com.github.knokko.boiler.sync.ResourceUsage
-import com.github.knokko.boiler.sync.WaitSemaphore
 import graviks2d.target.GraviksTarget
 import graviks2d.util.Color
 import gruviks.component.Component
@@ -210,7 +209,7 @@ class Pm2PreviewComponent(
                 boiler.queueFamilies().graphics.queues[0].submit(
                     previewCommandBuffer, "Pm2dPreviewComponent", emptyArray(), previewFence, previewSemaphore
                 )
-                target.addWaitSemaphore(WaitSemaphore(previewSemaphore, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT))
+                target.addWaitSemaphore(previewSemaphore, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT)
                 target.drawVulkanImage(0f, 0f, 1f, 1f, previewImage.vkImage, previewImage.vkImageView)
                 shouldAwaitFence = true
             } catch (runtimeError: PmRuntimeError) {

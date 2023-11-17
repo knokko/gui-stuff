@@ -50,7 +50,7 @@ internal class ImageCache(
             }
 
             val imageInputStream = if (image.file != null) {
-                Files.newInputStream(image.file.toPath())
+                Files.newInputStream(image.file!!.toPath())
             } else {
                 this.javaClass.classLoader.getResourceAsStream(image.path!!)!!
             }

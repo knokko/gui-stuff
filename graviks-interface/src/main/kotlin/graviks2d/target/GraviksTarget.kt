@@ -1,6 +1,5 @@
 package graviks2d.target
 
-import com.github.knokko.boiler.sync.WaitSemaphore
 import graviks2d.resource.image.ImageReference
 import graviks2d.resource.text.CharacterPosition
 import graviks2d.resource.text.FontReference
@@ -38,7 +37,7 @@ interface GraviksTarget {
     }
 
     @Throws(UnsupportedOperationException::class)
-    fun addWaitSemaphore(semaphore: WaitSemaphore) {
+    fun addWaitSemaphore(vkSemaphore: Long, dstStageMask: Int) {
         throw UnsupportedOperationException("This implementation (${this::class.java.simpleName}) doesn't support this")
     }
 

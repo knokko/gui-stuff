@@ -18,7 +18,7 @@ internal class FontManager(
 
 private fun loadFont(reference: FontReference): StbTrueTypeFont {
     val fontInput = if (reference.file != null) {
-        Files.newInputStream(reference.file.toPath())
+        Files.newInputStream(reference.file!!.toPath())
     } else {
         FontManager::class.java.classLoader.getResourceAsStream(reference.classLoaderPath!!)
             ?: throw IllegalArgumentException("Can't get resource ${reference.classLoaderPath}")

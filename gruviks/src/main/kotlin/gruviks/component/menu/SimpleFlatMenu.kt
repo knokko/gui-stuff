@@ -165,7 +165,7 @@ class SimpleFlatMenu(
         if (event is PositionedEvent) {
 
             val (transformedX, transformedY) = visibleRegion.transform(event.position.x, event.position.y)
-            val transformedPoint = Point.fromFloat(transformedX, transformedY)
+            val transformedPoint = Point(transformedX, transformedY)
 
             val targetComponents = componentTree.findBetween(transformedPoint.toRectRegion())
             if (targetComponents.isNotEmpty()) {
@@ -188,13 +188,13 @@ class SimpleFlatMenu(
             val (oldX, oldY) = visibleRegion.transform(event.oldPosition.x, event.oldPosition.y)
             val (newX, newY) = visibleRegion.transform(event.newPosition.x, event.newPosition.y)
 
-            val minX = min(oldX, newX)
-            val minY = min(oldY, newY)
-            val maxX = max(oldX, newX)
-            val maxY = max(oldY, newY)
+            val minX = Coordinate.min(oldX, newX)
+            val minY = Coordinate.min(oldY, newY)
+            val maxX = Coordinate.max(oldX, newX)
+            val maxY = Coordinate.max(oldY, newY)
 
-            val margin = 0.01f
-            val relevantRegion = RectRegion.fromFloat(
+            val margin = Coordinate.percentage(1)
+            val relevantRegion = RectRegion(
                 minX - margin, minY - margin, maxX + margin, maxY + margin
             )
             val targetComponents = componentTree.findBetween(relevantRegion).filter { (_, node) ->

@@ -20,7 +20,11 @@ value class Coordinate private constructor(private val rawValue: Long) : Compara
         return Coordinate(rawValue * scalar)
     }
 
+    operator fun times(scalar: Int) = times(scalar.toLong())
+
     operator fun div(right: Long) = Coordinate(divideRounded(this.rawValue, right))
+
+    operator fun div(right: Int) = div(right.toLong())
 
     fun toFloat() = rawValue.toFloat() / RAW_ONE.toFloat()
 
@@ -45,5 +49,13 @@ value class Coordinate private constructor(private val rawValue: Long) : Compara
         }
 
         fun fromFloat(value: Float) = Coordinate((value * RAW_ONE).toLong())
+
+        fun min(a: Coordinate, b: Coordinate) = Coordinate(kotlin.math.min(a.rawValue, b.rawValue))
+
+        fun max(a: Coordinate, b: Coordinate) = Coordinate(kotlin.math.max(a.rawValue, b.rawValue))
     }
 }
+
+operator fun Long.times(right: Coordinate) = right * this
+
+operator fun Int.times(right: Coordinate) = right * this

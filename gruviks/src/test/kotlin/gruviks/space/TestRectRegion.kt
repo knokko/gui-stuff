@@ -43,22 +43,33 @@ class TestRectRegion {
 
     @Test
     fun testTransform() {
-        val margin = 0.001f
         val region = RectRegion.percentage(20, 50, 60, 80)
 
         run {
             val (x, y) = region.transform(Point.percentage(25, 100))
-            assertEquals(0.3f, x, margin)
-            assertEquals(0.8f, y, margin)
+            assertEquals(Coordinate.percentage(30), x)
+            assertEquals(Coordinate.percentage(80), y)
         }
 
         run {
             val transformed = region.transform(RectRegion.percentage(-100, 10, 50, 30))
-            assertEquals(-0.2f, transformed.minX, margin)
-            assertEquals(0.53f, transformed.minY, margin)
-            assertEquals(0.4f, transformed.maxX, margin)
-            assertEquals(0.59f, transformed.maxY, margin)
+            assertEquals(Coordinate.percentage(-20), transformed.minX)
+            assertEquals(Coordinate.percentage(53), transformed.minY)
+            assertEquals(Coordinate.percentage(40), transformed.boundX)
+            assertEquals(Coordinate.percentage(59), transformed.boundY)
         }
+    }
+
+    @Test
+    fun testTransformPrecision() {
+        val offsetX = 1_000_000_000
+        val offsetY = -2_000_000_000
+
+        val region = RectRegion.percentage(offsetX + 20, offsetY + 50, offsetX + 60, offsetY + 80)
+
+        val (x, y) = region.transform(Point.percentage(25, 100))
+        assertEquals(Coordinate.percentage(offsetX + 30), x)
+        assertEquals(Coordinate.percentage(offsetY + 80), y)
     }
 
     @Test
@@ -79,5 +90,17 @@ class TestRectRegion {
             assertEquals(2f, transformed.maxX, margin)
             assertEquals(0.9f, transformed.maxY, margin)
         }
+    }
+
+    @Test
+    fun testTransformBackPrecision() {
+        val offsetX = 1_000_000_000
+        val offsetY = -2_000_000_000
+        val margin = 0.001f
+        val region = RectRegion.percentage(offsetX + 50, offsetY, offsetX + 100, offsetY + 200)
+
+        val (x, y) = region.transformBack(Point.percentage(offsetX + 70, offsetY + 150))
+        assertEquals(0.4f, x, margin)
+        assertEquals(0.75f, y, margin)
     }
 }

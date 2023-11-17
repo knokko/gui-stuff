@@ -21,31 +21,25 @@ class RectRegion(
     override fun equals(other: Any?) = other is RectRegion && this.minX == other.minX && this.minY == other.minY &&
             this.boundX == other.boundX && this.boundY == other.boundY
 
-    // TODO Test precision of this
     fun transform(x: Float, y: Float) = Pair(
-        minX.toFloat() + x * (boundX - minX).toFloat(),
-        minY.toFloat() + y * (boundY - minY).toFloat()
+        minX + Coordinate.fromFloat(x * (boundX - minX).toFloat()),
+        minY + Coordinate.fromFloat(y * (boundY - minY).toFloat())
     )
 
     fun transform(point: Point) = transform(point.x.toFloat(), point.y.toFloat())
 
-    fun transform(child: RectRegion): RectangularDrawnRegion {
+    fun transform(child: RectRegion): RectRegion {
         val (transformedMinX, transformedMinY) = this.transform(Point(child.minX, child.minY))
         val (transformedBoundX, transformedBoundY) = this.transform(Point(child.boundX, child.boundY))
-        return RectangularDrawnRegion(
-            transformedMinX, transformedMinY, transformedBoundX, transformedBoundY
-        )
+        return RectRegion(transformedMinX, transformedMinY, transformedBoundX, transformedBoundY)
     }
 
-    fun transformBack(x: Float, y: Float) = Pair(
-        (x - minX.toFloat()) / (boundX - minX).toFloat(),
-        (y - minY.toFloat()) / (boundY - minY).toFloat()
+    fun transformBack(x: Coordinate, y: Coordinate) = Pair(
+        (x - minX).toFloat() / (boundX - minX).toFloat(),
+        (y - minY).toFloat() / (boundY - minY).toFloat()
     )
 
-    fun transformBack(point: Point) = Pair(
-        (point.x - minX).toFloat() / (boundX - minX).toFloat(),
-        (point.y - minY).toFloat() / (boundY - minY).toFloat()
-    )
+    fun transformBack(point: Point) = transformBack(point.x, point.y)
 
     fun transformBack(child: RectRegion): RectangularDrawnRegion {
         val (transformedMinX, transformedMinY) = this.transformBack(Point(child.minX, child.minY))
@@ -76,13 +70,6 @@ class RectRegion(
             Coordinate.fraction(minY, denominator),
             Coordinate.fraction(boundX, denominator),
             Coordinate.fraction(boundY, denominator)
-        )
-
-        fun fromFloat(minX: Float, minY: Float, maxX: Float, maxY: Float) = RectRegion(
-            Coordinate.fromFloat(minX),
-            Coordinate.fromFloat(minY),
-            Coordinate.fromFloat(maxX),
-            Coordinate.fromFloat(maxY)
         )
     }
 }

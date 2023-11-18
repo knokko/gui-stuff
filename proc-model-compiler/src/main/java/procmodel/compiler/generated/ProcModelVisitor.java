@@ -179,6 +179,12 @@ public interface ProcModelVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitListDeclaration(ProcModelParser.ListDeclarationContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link ProcModelParser#setDeclaration}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSetDeclaration(ProcModelParser.SetDeclarationContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link ProcModelParser#forLoop}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

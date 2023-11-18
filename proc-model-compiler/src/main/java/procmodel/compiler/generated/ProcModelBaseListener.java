@@ -353,6 +353,18 @@ public class ProcModelBaseListener implements ProcModelListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterSetDeclaration(ProcModelParser.SetDeclarationContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSetDeclaration(ProcModelParser.SetDeclarationContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterForLoop(ProcModelParser.ForLoopContext ctx) { }
 	/**
 	 * {@inheritDoc}

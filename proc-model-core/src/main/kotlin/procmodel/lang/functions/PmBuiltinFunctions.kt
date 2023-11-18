@@ -1,6 +1,7 @@
 package procmodel.lang.functions
 
 import org.joml.Math
+import procmodel.exceptions.PmRuntimeError
 import procmodel.lang.types.*
 
 object PmBuiltinFunctions {
@@ -25,8 +26,12 @@ object PmBuiltinFunctions {
     private val COS = PmBuiltinFunction(listOf(PmBuiltinTypes.FLOAT), PmBuiltinTypes.FLOAT) {
         parameters -> PmFloat(Math.cos(Math.toRadians(parameters[0].floatValue())))
     }
-    private val ADD_TO_LIST = PmBuiltinFunction(listOf(PmBuiltinTypes.LIST, PmBuiltinTypes.ANY), PmBuiltinTypes.LIST) { parameters ->
-        parameters[0].castTo<PmList>().elements.add(parameters[1])
+    private val ADD_TO_COLLECTION = PmBuiltinFunction(listOf(PmBuiltinTypes.ANY, PmBuiltinTypes.ANY), PmBuiltinTypes.ANY) { parameters ->
+        val collection = parameters[0]
+        if (collection is PmList) collection.elements.add(parameters[1])
+        else if (collection is PmSet) collection.elements.add(parameters[1])
+        else throw PmRuntimeError("First parameter of add(...) must be a List or Set")
+
         parameters[0]
     }
 
@@ -37,6 +42,6 @@ object PmBuiltinFunctions {
         Pair("float", FLOAT),
         Pair("sin", SIN),
         Pair("cos", COS),
-        Pair("add", ADD_TO_LIST),
+        Pair("add", ADD_TO_COLLECTION),
     )
 }

@@ -20,9 +20,11 @@ object PmBuiltinTypes {
 
     val LIST = PmType("List", createDefaultValue = { PmList(mutableListOf()) }, valueClass = PmList::class)
 
+    val SET = PmType("Set", createDefaultValue = { PmSet(mutableSetOf()) }, valueClass = PmSet::class)
+
     val MAP = PmType("Map", createDefaultValue = { PmMap() }, valueClass = PmMap::class)
 
     val RANDOM = PmType("Random", createDefaultValue = { PmRandom(Random.Default) }, valueClass = PmRandom::class)
 
-    val ALL = listOf(VOID, ANY, FLOAT, INT, STRING, COLOR, MATRIX_INDEX, LIST, MAP, RANDOM)
+    val ALL = listOf(VOID, ANY, FLOAT, INT, STRING, COLOR, MATRIX_INDEX, LIST, SET, MAP, RANDOM)
 }

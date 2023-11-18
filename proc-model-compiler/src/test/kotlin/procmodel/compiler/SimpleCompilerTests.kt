@@ -83,6 +83,18 @@ class SimpleCompilerTests {
     }
 
     @Test
+    fun testSets() {
+        valueTest("""
+            Set test1234 = {3, 1, 2, 2};
+            add(test1234, 4);
+            add(test1234, 3);
+            outputValue(test1234 + {6, 5, 5});
+        """, PmSet(mutableSetOf(
+            PmInt(1), PmInt(2), PmInt(3), PmInt(4), PmInt(5), PmInt(6)
+        )))
+    }
+
+    @Test
     fun testMaps() {
         valueTest("""
             Map habitats;

@@ -119,7 +119,7 @@ abstract class PmProcessor(
         }
     }
 
-    protected fun invokeBuiltinFunction(name: String) {
+    private fun invokeBuiltinFunction(name: String) {
         val builtinFunction = PmBuiltinFunctions.MAP[name] ?: customBuiltinFunctions[name]
             ?: throw PmRuntimeError("Unknown built-in function $name")
         builtinFunction.invoke(valueStack)

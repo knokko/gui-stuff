@@ -69,6 +69,7 @@ expression :
     '(' expression ')' |
     positionConstructor |
     listDeclaration |
+    setDeclaration |
     expression (DIVIDE|TIMES) expression |
     expression (MINUS|PLUS) expression |
     dynamicDeclaration;
@@ -80,6 +81,8 @@ positionConstructor : '(' expression ',' expression ')';
 listElement : expression;
 
 listDeclaration : '[' (listElement ',')* listElement? ']';
+
+setDeclaration : '{' (listElement ',')* listElement? '}';
 
 PLUS : '+';
 MINUS : '-';

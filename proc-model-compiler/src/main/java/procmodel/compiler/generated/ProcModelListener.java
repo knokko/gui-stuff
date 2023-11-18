@@ -288,6 +288,16 @@ public interface ProcModelListener extends ParseTreeListener {
 	 */
 	void exitListDeclaration(ProcModelParser.ListDeclarationContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link ProcModelParser#setDeclaration}.
+	 * @param ctx the parse tree
+	 */
+	void enterSetDeclaration(ProcModelParser.SetDeclarationContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ProcModelParser#setDeclaration}.
+	 * @param ctx the parse tree
+	 */
+	void exitSetDeclaration(ProcModelParser.SetDeclarationContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link ProcModelParser#forLoop}.
 	 * @param ctx the parse tree
 	 */

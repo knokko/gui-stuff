@@ -330,17 +330,16 @@ class PmCompiler<VertexValue : PmValue>(
         val relativePath = "/" + ctx.importPath().relativeImportPath().text
         val importedTriangles = importer.importTriangles(relativePath, isRelative)
 
-        val importedValue = when (ctx.IDENTIFIER().text) {
-            "triangles" -> importedTriangles.second
-            "vertices" -> importedTriangles.first
+        val (importedValue, importedType) = when (ctx.IDENTIFIER().text) {
+            "triangles" -> Pair(PmList(importedTriangles.second.toMutableList()), PmBuiltinTypes.LIST)
+            "vertices" -> Pair(PmSet(importedTriangles.first.toMutableSet()), PmBuiltinTypes.SET)
             else -> throw PmCompileError("Expected to import 'triangles' or 'vertices', but got ${ctx.IDENTIFIER().text}")
         }
 
         val name = ctx.importAlias()?.IDENTIFIER()?.text ?: ctx.importPath().relativeImportPath().IDENTIFIER().last().text
 
-        // TODO Use a Set instead of a List for the vertices, when Set support is added
-        instructions.add(PmInstruction.pushValue(PmList(importedValue.toMutableList()), ctx.start.line))
-        instructions.add(PmInstruction.declareVariable(name, PmBuiltinTypes.LIST, ctx.stop.line))
+        instructions.add(PmInstruction.pushValue(importedValue, ctx.start.line))
+        instructions.add(PmInstruction.declareVariable(name, importedType, ctx.stop.line))
     }
 
     override fun enterChildModelBlock(ctx: ProcModelParser.ChildModelBlockContext?) {
@@ -421,6 +420,10 @@ class PmCompiler<VertexValue : PmValue>(
 
     override fun enterListDeclaration(ctx: ProcModelParser.ListDeclarationContext?) {
         instructions.add(PmInstruction.pushValue(PmList(mutableListOf()), ctx!!.start.line))
+    }
+
+    override fun enterSetDeclaration(ctx: ProcModelParser.SetDeclarationContext?) {
+        instructions.add(PmInstruction.pushValue(PmSet(mutableSetOf()), ctx!!.start.line))
     }
 
     override fun exitListElement(ctx: ProcModelParser.ListElementContext?) {

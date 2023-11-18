@@ -11,14 +11,15 @@ import gruviks.feedback.RequestKeyboardFocusFeedback
 import org.joml.Matrix3x2f
 import org.joml.Vector2f
 import org.lwjgl.glfw.GLFW.*
+import procmodel.editor.PmShapeEditor
 import procmodel2.Pm2dPositionValue
 import procmodel2.Pm2dVertexValue
 import kotlin.math.absoluteValue
 
 class Pm2dShapeEditor(
-    val points: MutableSet<Pm2dVertexValue>,
-    val triangles: MutableList<Pm2dVertexValue>
-): Component() {
+    override val points: MutableSet<Pm2dVertexValue>,
+    override val triangles: MutableList<Pm2dVertexValue>
+): Component(), PmShapeEditor<Pm2dVertexValue> {
 
     private val cameraMatrix = Matrix3x2f().scale(0.5f).translate(1f, 1f)
 

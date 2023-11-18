@@ -1,9 +1,9 @@
-package procmodel.editor2d
+package procmodel.editor
 
 import graviks2d.resource.text.FontReference
 import graviks2d.util.Color
 
-class Pm2dColorTheme(
+class PmColorTheme(
     val defaultText: Color,
     val background: Color,
     val selectionBackground: Color,
@@ -19,7 +19,7 @@ class Pm2dColorTheme(
     val font: FontReference? = null
 ) {
     companion object {
-        val TEST = Pm2dColorTheme(
+        val TEST = PmColorTheme(
             defaultText = Color.WHITE,
             background = Color.rgbInt(30, 0, 90),
             selectionBackground = Color.rgbInt(0, 50, 150),

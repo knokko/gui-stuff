@@ -203,6 +203,25 @@ project(':proc-model-playground') {
     }
 }
 
+project(':proc-model-editor') {
+    dependencies {
+        implementation project(':graviks-interface')
+        implementation project(':graviks2d')
+        implementation project(':graviks-glfw')
+        implementation project(':gruviks')
+        implementation project(':gruviks-glfw')
+
+        implementation project(':proc-model-core')
+        implementation project(':proc-model-compiler')
+        implementation project(':proc-model-processor')
+        implementation project(':proc-model-renderer')
+
+        implementation 'com.github.knokko:sample-profiler:v1.0.0'
+        implementation "org.lwjgl:lwjgl-glfw"
+        implementation 'org.antlr:antlr4:4.13.0'
+    }
+}
+
 project(':proc-model-editor2d') {
     dependencies {
         implementation project(':graviks-interface')
@@ -215,6 +234,7 @@ project(':proc-model-editor2d') {
         implementation project(':proc-model-compiler')
         implementation project(':proc-model-processor')
         implementation project(':proc-model-renderer')
+        implementation project(':proc-model-editor')
         implementation project(':proc-model-2d')
 
         implementation 'com.github.knokko:sample-profiler:v1.0.0'

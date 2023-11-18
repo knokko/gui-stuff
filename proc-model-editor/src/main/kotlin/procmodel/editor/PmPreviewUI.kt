@@ -1,4 +1,4 @@
-package procmodel.editor2d
+package procmodel.editor
 
 import graviks2d.resource.text.TextStyle
 import graviks2d.util.Color
@@ -15,8 +15,18 @@ import gruviks.space.Point
 import gruviks.space.RectRegion
 import gruviks.space.SpaceLayout
 import procmodel.lang.types.*
+import procmodel.model.PmModel
 
-fun createParameterConfigurationMenu(previewComponent: Pm2PreviewComponent): Component {
+interface PmPreviewComponent<Vertex> {
+
+    val dynamicParameterValues: MutableMap<String, PmValue>
+
+    fun getDynamicParameterTypes(): Map<String, PmType>
+
+    fun updateModel(newModel: PmModel<Vertex>)
+}
+
+fun <Vertex> createParameterConfigurationMenu(previewComponent: PmPreviewComponent<Vertex>): Component {
     val parameterValues = mutableMapOf<String, PmValue>()
 
     fun updateParameterValues(): String {
@@ -28,7 +38,7 @@ fun createParameterConfigurationMenu(previewComponent: Pm2PreviewComponent): Com
     }
 
     val menu = SimpleFlatMenu(SpaceLayout.Simple, backgroundColor)
-    menu.addComponent(previewComponent, RectRegion.percentage(0, 0, 70, 100))
+    menu.addComponent(previewComponent as Component, RectRegion.percentage(0, 0, 70, 100))
 
     val textFieldStyle = transparentTextFieldStyle(
         defaultStyle = TextStyle(fillColor = Color.rgbInt(200, 200, 200), font = null),

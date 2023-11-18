@@ -1,11 +1,10 @@
-package procmodel.editor2d
+package procmodel.editor
 
 import com.github.knokko.boiler.instance.BoilerInstance
 import gruviks.component.Component
 import gruviks.component.text.TextArea
 import gruviks.component.text.TextComponent
 import gruviks.component.util.SwitchComponent
-import org.joml.Matrix3x2f
 import procmodel.exceptions.PmCompileError
 import procmodel.exceptions.PmRuntimeError
 import procmodel.importer.PmFileImportFunctions
@@ -13,17 +12,20 @@ import procmodel.importer.PmImportCache
 import procmodel.importer.PmImporter
 import procmodel.importer.PmShapes
 import procmodel.lang.types.PmNone
+import procmodel.lang.types.PmValue
 import procmodel.model.PmModel
 import procmodel.renderer.PmInstance
-import procmodel2.*
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
 
-private fun createImporter(sourceFile: File, openFiles: List<OpenFile>): PmImporter<Pm2dVertexValue> {
+private fun <Vertex, VertexValue : PmValue, Matrix> createImporter(
+    config: EditorConfig<Vertex, VertexValue, Matrix>,
+    sourceFile: File, openFiles: List<OpenFile<Vertex, VertexValue, Matrix>>
+): PmImporter<VertexValue> {
     for (openFile in openFiles) openFile.save(false)
 
-    val rootPath = rootDirectory.absolutePath
+    val rootPath = config.rootDirectory.absolutePath
     val sourcePath = sourceFile.absoluteFile.parentFile.absolutePath
     if (!sourcePath.startsWith(rootPath)) {
         throw Error("The source $sourcePath is not a descendant from the root $rootPath")
@@ -31,24 +33,30 @@ private fun createImporter(sourceFile: File, openFiles: List<OpenFile>): PmImpor
 
     var prefix = sourcePath.substring(rootPath.length)
     if (prefix.startsWith("/") || prefix.startsWith("\\")) prefix = prefix.substring(1)
-    return PmImporter(PmImportCache(PmFileImportFunctions(rootDirectory)), prefix, Pm2dShapes::parseVertex)
+    return PmImporter(PmImportCache(PmFileImportFunctions(config.rootDirectory)), prefix, config::parseVertex)
 }
 
-internal class OpenFile(
+interface PmShapeEditor<VertexValue : PmValue> {
+    val points: Set<VertexValue>
+    val triangles: List<VertexValue>
+}
+
+class OpenFile<Vertex, VertexValue : PmValue, Matrix>(
+    private val config: EditorConfig<Vertex, VertexValue, Matrix>,
     val modelFile: File,
     val parametersFile: File?,
     private val textArea: TextArea?,
-    private val shapeEditor: Pm2dShapeEditor?,
-    private val createPreview: () -> Pair<Component, (PmModel<Pm2dVertex>) -> Unit>?
+    private val shapeEditor: PmShapeEditor<VertexValue>?,
+    private val createPreview: () -> Pair<Component, (PmModel<Vertex>) -> Unit>?
 ) {
     val preview = lazy { createPreview() }
 
     fun getPrimaryComponent(): Component {
         if (textArea != null) return textArea
-        return shapeEditor!!
+        return shapeEditor as Component
     }
 
-    fun updatePreview(errorComponent: TextComponent, openFiles: List<OpenFile>) {
+    fun updatePreview(errorComponent: TextComponent, openFiles: List<OpenFile<Vertex, VertexValue, Matrix>>) {
         // Shape files are the only files without textArea, and also the only files without preview
         if (textArea == null) return
 
@@ -62,7 +70,8 @@ internal class OpenFile(
 
         val parameters = if (parametersFile != null) {
             try {
-                Pm2dProcessor.compute(Pm2dCompiler.compile(textArea.getText(), createImporter(parametersFile, openFiles)))
+                val importer = createImporter(config, parametersFile, openFiles)
+                config.compute(config.compile(textArea.getText(), importer))
             } catch (compileError: PmCompileError) {
                 errorComponent.setText(compileError.message ?: "Failed to compile parameters")
                 compileError.printStackTrace()
@@ -75,9 +84,10 @@ internal class OpenFile(
 
         try {
             val startTime = System.currentTimeMillis()
-            val newProgram = Pm2dCompiler.compile(modelContent, createImporter(modelFile, openFiles))
+            val importer = createImporter(config, modelFile, openFiles)
+            val newProgram = config.compile(modelContent, importer)
             val time1 = System.currentTimeMillis()
-            val newModel = Pm2dProcessor.execute(newProgram, parameters)
+            val newModel = config.execute(newProgram, parameters)
             val time2 = System.currentTimeMillis()
 
             println("Compilation took ${time1 - startTime} ms and running took ${time2 - time1} ms")
@@ -110,7 +120,7 @@ internal class OpenFile(
         } else {
             return try {
                 val output = Files.newOutputStream(modelFile.toPath())
-                PmShapes.write(shapeEditor!!.points, shapeEditor.triangles, output, Pm2dShapes::writeVertex)
+                PmShapes.write(shapeEditor!!.points, shapeEditor.triangles, output, config::writeVertex)
                 output.close()
                 true
             } catch (failedToSave: IOException) {
@@ -121,17 +131,18 @@ internal class OpenFile(
     }
 
     companion object {
-        fun open(
-            file: File, openFiles: MutableList<OpenFile>,
+        fun <Vertex, VertexValue : PmValue, Matrix> open(
+            config: EditorConfig<Vertex, VertexValue, Matrix>,
+            file: File, openFiles: MutableList<OpenFile<Vertex, VertexValue, Matrix>>,
             switchComponent: SwitchComponent, errorComponent: TextComponent, updateController: () -> Unit,
-            boiler: BoilerInstance, pm2Instance: PmInstance<Pm2dVertex, Matrix3x2f>
+            boiler: BoilerInstance, pm2Instance: PmInstance<Vertex, Matrix>
         ) {
             val modelFile: File
             val parametersFile: File?
-            if (file.name.endsWith(".pm2")) {
+            if (file.name.endsWith(config.modelExtension)) {
                 modelFile = file
                 parametersFile = null
-            } else if (file.name.endsWith(".pv2")) {
+            } else if (file.name.endsWith(config.valueExtension)) {
                 val currentDirectory = file.parentFile
                 if (currentDirectory == null) {
                     errorComponent.setText("Can't find directory containing this file")
@@ -144,9 +155,9 @@ internal class OpenFile(
                     return
                 }
 
-                modelFile = File("$parentDirectory/${currentDirectory.name}.pm2")
+                modelFile = File("$parentDirectory/${currentDirectory.name}.${config.modelExtension}")
                 parametersFile = file
-            } else if (file.name.endsWith(".tri2")) {
+            } else if (file.name.endsWith(config.trianglesExtension)) {
                 modelFile = file
                 parametersFile = null
             } else {
@@ -157,7 +168,7 @@ internal class OpenFile(
             var openFile = openFiles.find { it.modelFile == modelFile && it.parametersFile == parametersFile }
             if (openFile != null) openFiles.remove(openFile)
             if (openFile == null) {
-                if (file.name.endsWith(".pm2") || file.name.endsWith(".pv2")) {
+                if (file.name.endsWith(config.modelExtension) || file.name.endsWith(config.valueExtension)) {
                     val modelContent: String
                     val parameterContent: String?
                     try {
@@ -172,7 +183,7 @@ internal class OpenFile(
 
                     val initialParameters = if (parameterContent != null) {
                         try {
-                            Pm2dProcessor.compute(Pm2dCompiler.compile(parameterContent, createImporter(parametersFile!!, openFiles)))
+                            config.compute(config.compile(parameterContent, createImporter(config, parametersFile!!, openFiles)))
                         } catch (compileError: PmCompileError) {
                             compileError.printStackTrace()
                             errorComponent.setText(compileError.message ?: "Parameter compile error")
@@ -184,8 +195,8 @@ internal class OpenFile(
                     } else PmNone()
 
                     val initialModel = try {
-                        Pm2dProcessor.execute(
-                            Pm2dCompiler.compile(modelContent, createImporter(modelFile, openFiles)),
+                        config.execute(
+                            config.compile(modelContent, createImporter(config, modelFile, openFiles)),
                             initialParameters
                         )
                     } catch (compileError: PmCompileError) {
@@ -195,24 +206,24 @@ internal class OpenFile(
                         null
                     }
 
-                    val textArea = TextArea(parameterContent ?: modelContent, textAreaStyle, null)
+                    val textArea = TextArea(parameterContent ?: modelContent, config.textAreaStyle, null)
                     val createPreview = {
-                        val previewComponent = Pm2PreviewComponent(
+                        val previewComponent = config.createPreview(
                             boiler, pm2Instance, initialModel, errorComponent::setText
                         )
                         val configurationComponent = createParameterConfigurationMenu(previewComponent)
                         Pair(configurationComponent, previewComponent::updateModel)
                     }
-                    openFile = OpenFile(modelFile, parametersFile, textArea, null, createPreview)
-                } else if (file.name.endsWith("tri2")) {
+                    openFile = OpenFile(config, modelFile, parametersFile, textArea, null, createPreview)
+                } else if (file.name.endsWith(config.trianglesExtension)) {
                     val shapeEditor = if (file.length() == 0L) {
-                        Pm2dShapeEditor(mutableSetOf(), mutableListOf())
+                        config.createShapeEditor(mutableSetOf(), mutableListOf())
                     } else {
                         try {
                             val input = Files.newInputStream(file.toPath())
-                            val (vertexSet, triangleList) = PmShapes.parse(input, Pm2dShapes::parseVertex)
+                            val (vertexSet, triangleList) = PmShapes.parse(input, config::parseVertex)
                             input.close()
-                            Pm2dShapeEditor(vertexSet.toMutableSet(), triangleList.toMutableList())
+                            config.createShapeEditor(vertexSet.toMutableSet(), triangleList.toMutableList())
                         } catch (failed: Throwable) {
                             failed.printStackTrace()
                             errorComponent.setText("Failed to open triangle file: ${failed.message}")
@@ -220,7 +231,7 @@ internal class OpenFile(
                         }
                     }
 
-                    openFile = OpenFile(modelFile, null, null, shapeEditor) { null }
+                    openFile = OpenFile(config, modelFile, null, null, shapeEditor) { null }
                 } else {
                     throw IllegalArgumentException("Unexpected file $file")
                 }

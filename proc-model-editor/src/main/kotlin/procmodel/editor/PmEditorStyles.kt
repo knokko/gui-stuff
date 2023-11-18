@@ -1,4 +1,4 @@
-package procmodel.editor2d
+package procmodel.editor
 
 import graviks2d.resource.text.TextStyle
 import graviks2d.util.Color
@@ -7,9 +7,6 @@ import gruviks.component.VerticalComponentAlignment
 import gruviks.component.text.TextButtonStyle
 
 internal val backgroundColor = Color.rgbInt(30, 0, 90)
-
-private val colorTheme = Pm2dColorTheme.TEST
-internal val textAreaStyle = pm2dSyntaxTextAreaStyle(colorTheme, 0.05f)
 
 internal val tabStyle = TextButtonStyle.textAndBorder(
     baseColor = Color.WHITE.scale(0.8f),

@@ -20,6 +20,7 @@ import org.lwjgl.util.vma.Vma.vmaDestroyImage
 import org.lwjgl.vulkan.VK13.*
 import org.lwjgl.vulkan.VkRenderingAttachmentInfo
 import org.lwjgl.vulkan.VkRenderingInfo
+import procmodel.editor.PmPreviewComponent
 import procmodel.exceptions.PmRuntimeError
 import procmodel.lang.types.PmValue
 import procmodel.model.PmModel
@@ -39,10 +40,11 @@ class Pm2PreviewComponent(
     private val boiler: BoilerInstance,
     private val pmInstance: PmInstance<Pm2dVertex, Matrix3x2f>,
     initialModel: PmModel<Pm2dVertex>?, private val reportError: (String) -> Unit
-): Component() {
+): Component(), PmPreviewComponent<Pm2dVertex> {
 
     private var lastDynamicParameterValues: MutableMap<String, PmValue>? = null
-    val dynamicParameterValues = mutableMapOf<String, PmValue>()
+
+    override val dynamicParameterValues = mutableMapOf<String, PmValue>()
 
     private val cameraMatrix = Matrix3x2f().scale(1f, -1f)
 
@@ -62,9 +64,9 @@ class Pm2PreviewComponent(
 
     private lateinit var previewImage: VmaImage
 
-    fun getDynamicParameterTypes() = currentMesh.dynamicParameterTypes
+    override fun getDynamicParameterTypes() = currentMesh.dynamicParameterTypes
 
-    fun updateModel(newModel: PmModel<Pm2dVertex>) {
+    override fun updateModel(newModel: PmModel<Pm2dVertex>) {
         val newMesh = pmInstance.meshes.allocate(newModel)
 
         if (shouldAwaitFence) {

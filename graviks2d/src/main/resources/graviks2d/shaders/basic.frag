@@ -42,6 +42,16 @@ const int OP_CODE_DRAW_TEXT = 6;
 const int OP_CODE_DRAW_ROUNDED_RECT = 7;
 const int OP_CODE_DRAW_RECT = 8;
 
+float srgbToLinear(float srgbScalar) {
+    // This formula came from https://en.wikipedia.org/wiki/SRGB#From_sRGB_to_CIE_XYZ
+    if (srgbScalar > 0.0405) return pow((srgbScalar + 0.055) / (1.055), 2.4);
+    else return srgbScalar / 12.92;
+}
+
+vec4 srgbToLinear(vec4 srgbColor) {
+    return vec4(srgbToLinear(srgbColor.r), srgbToLinear(srgbColor.g), srgbToLinear(srgbColor.b), srgbColor.a);
+}
+
 void main() {
     float scissorMinX = decodeFloat(shaderStorage.operations[scissorIndex]);
     float scissorMinY = decodeFloat(shaderStorage.operations[scissorIndex + 1]);
@@ -56,7 +66,7 @@ void main() {
 
     if (operationCode == OP_CODE_FILL) {
         vec4 fillColor = decodeColor(shaderStorage.operations[operationIndex + 1]);
-        outColor = fillColor;
+        outColor = srgbToLinear(fillColor);
     } else if (operationCode == OP_CODE_DRAW_IMAGE) {
         int imageIndex = shaderStorage.operations[operationIndex + 1];
         vec2 textureCoordinates = vec2(quadCoordinates.x, 1.0 - quadCoordinates.y);
@@ -82,7 +92,7 @@ void main() {
             strokeIntensity = (1.0 - rawIntensity) / (1.0 - strokeThreshold);
             fillIntensity = 1.0 - strokeIntensity;
         }
-        outColor = strokeIntensity * strokeColor + fillIntensity * textColor;
+        outColor = srgbToLinear(strokeIntensity * strokeColor + fillIntensity * textColor);
     } else if (operationCode == OP_CODE_DRAW_ROUNDED_RECT) {
         vec4 fillColor = decodeColor(shaderStorage.operations[operationIndex + 1]);
         float minX = decodeFloat(shaderStorage.operations[operationIndex + 2]);
@@ -127,7 +137,7 @@ void main() {
                 intensity = max(0.0, (1.0 - referenceDistance) / 0.04);
             }
         }
-        outColor = fillColor * min(1.0, intensity);
+        outColor = srgbToLinear(fillColor * min(1.0, intensity));
     } else if (operationCode == OP_CODE_DRAW_RECT) {
         float lineWidthX = decodeFloat(shaderStorage.operations[operationIndex + 1]);
         float lineWidthY = decodeFloat(shaderStorage.operations[operationIndex + 2]);
@@ -150,9 +160,9 @@ void main() {
 
         float intensity = (0.5 - edgeDistance) / 0.3;
 
-        outColor = color * min(1.0, intensity);
+        outColor = srgbToLinear(color * min(1.0, intensity));
     } else {
         // This is the 'unknown operation code' color, for the sake of debugging
-        outColor = vec4(1.0, 0.2, 0.6, 1.0);
+        outColor = srgbToLinear(vec4(1.0, 0.2, 0.6, 1.0));
     }
 }

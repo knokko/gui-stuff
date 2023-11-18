@@ -45,7 +45,7 @@ class GraviksWindow(
         this.boiler = builder
             .window(0L, initialWidth, initialHeight, BoilerSwapchainBuilder(
                 VK_IMAGE_USAGE_TRANSFER_DST_BIT
-            ).surfaceFormatPicker(SimpleSurfaceFormatPicker(VK_FORMAT_B8G8R8A8_UNORM)))
+            ))
             .desiredVkInstanceExtensions(listOf(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME))
             .desiredVkDeviceExtensions(listOf(
                 VK_KHR_INCREMENTAL_PRESENT_EXTENSION_NAME,

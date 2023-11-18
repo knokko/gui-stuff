@@ -5,7 +5,7 @@ import org.lwjgl.util.vma.Vma.*
 import org.lwjgl.vulkan.VK10.*
 import com.github.knokko.boiler.images.VmaImage
 
-internal const val TARGET_COLOR_FORMAT = VK_FORMAT_R8G8B8A8_UNORM
+internal const val TARGET_COLOR_FORMAT = VK_FORMAT_R8G8B8A8_SRGB
 
 internal class ContextTargetImages(
     val context: GraviksContext

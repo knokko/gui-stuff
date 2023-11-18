@@ -45,7 +45,7 @@ internal fun createImagePair(
             ?: throw IllegalArgumentException("Can't decode image at path $pathDescription")
 
         val image = instance.boiler.images.createSimple(
-            stack, width, height, VK_FORMAT_R8G8B8A8_UNORM,
+            stack, width, height, VK_FORMAT_R8G8B8A8_SRGB,
             VK_IMAGE_USAGE_TRANSFER_DST_BIT or VK_IMAGE_USAGE_SAMPLED_BIT,
             VK_IMAGE_ASPECT_COLOR_BIT, name
         )

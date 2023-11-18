@@ -704,14 +704,14 @@ class TestContext {
 
         stackPush().use { stack ->
             val destImage = boiler.images.create(
-                stack, graviks.width, graviks.height, VK_FORMAT_B8G8R8A8_UNORM,
+                stack, graviks.width, graviks.height, VK_FORMAT_B8G8R8A8_SRGB,
                 VK_IMAGE_USAGE_TRANSFER_SRC_BIT or VK_IMAGE_USAGE_TRANSFER_DST_BIT,
                 VK_IMAGE_ASPECT_COLOR_BIT, VK_SAMPLE_COUNT_1_BIT, 1, 1,
                 false, "TestDestImage"
             )
 
             graviks.copyColorImageTo(
-                destImage = destImage.vkImage, destBuffer = null, destImageFormat = VK_FORMAT_B8G8R8A8_UNORM,
+                destImage = destImage.vkImage, destBuffer = null, destImageFormat = VK_FORMAT_B8G8R8A8_SRGB,
                 originalImageLayout = VK_IMAGE_LAYOUT_UNDEFINED, finalImageLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
                 imageSrcUsage = null, imageDstUsage = ResourceUsage(VK_ACCESS_TRANSFER_READ_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT),
                 shouldAwaitCompletion = true

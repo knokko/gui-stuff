@@ -17,6 +17,8 @@ import gruviks.feedback.RequestKeyboardFocusFeedback
 import org.joml.Matrix3x2f
 import org.lwjgl.system.MemoryStack.stackPush
 import org.lwjgl.util.vma.Vma.vmaDestroyImage
+import org.lwjgl.vulkan.KHRDynamicRendering.vkCmdBeginRenderingKHR
+import org.lwjgl.vulkan.KHRDynamicRendering.vkCmdEndRenderingKHR
 import org.lwjgl.vulkan.VK13.*
 import org.lwjgl.vulkan.VkRenderingAttachmentInfo
 import org.lwjgl.vulkan.VkRenderingInfo
@@ -186,7 +188,7 @@ class Pm2PreviewComponent(
                 biRender.layerCount(1)
                 biRender.pColorAttachments(colorAttachments)
 
-                vkCmdBeginRendering(previewCommandBuffer, biRender)
+                vkCmdBeginRenderingKHR(previewCommandBuffer, biRender)
 
                 val renderPassInfo = PmRenderPassInfo.dynamicRendering(
                     { ciRendering, _ ->
@@ -203,7 +205,7 @@ class Pm2PreviewComponent(
                     previewCommandBuffer, renderPassInfo, previewMatrices.descriptorSet,
                     previewImage.width, previewImage.height, listOf(Pair(currentMesh, 0)), cameraMatrix
                 )
-                vkCmdEndRendering(previewCommandBuffer)
+                vkCmdEndRenderingKHR(previewCommandBuffer)
 
                 commands.transitionColorLayout(
                     previewImage.vkImage, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,

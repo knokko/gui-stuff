@@ -9,7 +9,10 @@ import graviks.glfw.GraviksWindow
 import graviks2d.context.GraviksContext
 import gruviks.glfw.createAndControlGruviksWindow
 import org.joml.Matrix3x2f
-import org.lwjgl.vulkan.VK13.VK_API_VERSION_1_3
+import org.lwjgl.vulkan.KHRDynamicRendering.VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME
+import org.lwjgl.vulkan.VK12.*
+import org.lwjgl.vulkan.VkPhysicalDeviceDynamicRenderingFeaturesKHR
+import org.lwjgl.vulkan.VkPhysicalDeviceFeatures2
 import procmodel.editor.EditorConfig
 import procmodel.editor.PmColorTheme
 import procmodel.editor.createPmEditor
@@ -63,9 +66,29 @@ fun main() {
     val profiler = SampleProfiler(storage)
     profiler.start()
 
-    val builder = BoilerBuilder(VK_API_VERSION_1_3, "Pm2Editor", 1)
-        .validation(ValidationFeatures(true, true, false, true, true))
-        .featurePicker13 { _, _, toEnable -> toEnable.dynamicRendering(true) }
+    val builder = BoilerBuilder(VK_API_VERSION_1_2, "Pm2Editor", 1)
+        .validation(ValidationFeatures(false, false, false, true, true))
+        .requiredDeviceExtensions(setOf(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME))
+        .extraDeviceRequirements { physicalDevice, _, stack ->
+            val dynamicRendering = VkPhysicalDeviceDynamicRenderingFeaturesKHR.calloc(stack)
+            dynamicRendering.`sType$Default`()
+
+            val features2 = VkPhysicalDeviceFeatures2.calloc(stack)
+            features2.`sType$Default`()
+            features2.pNext(dynamicRendering)
+
+            vkGetPhysicalDeviceFeatures2(physicalDevice, features2)
+
+            dynamicRendering.dynamicRendering()
+        }
+        .beforeDeviceCreation { ciDevice, _, stack ->
+            val dynamicRendering = VkPhysicalDeviceDynamicRenderingFeaturesKHR.calloc(stack)
+            dynamicRendering.`sType$Default`()
+            dynamicRendering.dynamicRendering(true)
+
+            ciDevice.pNext(dynamicRendering)
+        }
+
     val graviksWindow = GraviksWindow(
         1600, 900, builder
     ) { instance, width, height -> GraviksContext(instance, width, height) }

@@ -1,12 +1,11 @@
 package graviks.glfw
 
 import com.github.knokko.boiler.builder.BoilerBuilder
-import com.github.knokko.boiler.builder.BoilerBuilder.DEFAULT_VK_DEVICE_CREATOR
 import com.github.knokko.boiler.builder.BoilerSwapchainBuilder
-import com.github.knokko.boiler.builder.swapchain.SimpleSurfaceFormatPicker
 import com.github.knokko.boiler.exceptions.VulkanFailureException.assertVkSuccess
 import com.github.knokko.boiler.instance.BoilerInstance
 import com.github.knokko.boiler.sync.ResourceUsage
+import com.github.knokko.boiler.util.CollectionHelper
 import graviks2d.context.GraviksContext
 import graviks2d.core.GraviksInstance
 import org.lwjgl.system.MemoryStack
@@ -52,32 +51,30 @@ class GraviksWindow(
                 VK_KHR_PRESENT_WAIT_EXTENSION_NAME,
                 VK_KHR_PRESENT_ID_EXTENSION_NAME
             ))
-            .vkDeviceCreator { stack, vkPhysicalDevice, deviceExtensions, ciDevice ->
-                if (deviceExtensions.contains(VK_KHR_PRESENT_WAIT_EXTENSION_NAME)) {
-                    val presentWaitSupport = VkPhysicalDevicePresentWaitFeaturesKHR.calloc(stack)
-                    presentWaitSupport.`sType$Default`()
+                .beforeDeviceCreation { ciDevice, physicalDevice, stack ->
+                    val deviceExtensions = CollectionHelper.decodeStringSet(ciDevice.ppEnabledExtensionNames())
+                    if (deviceExtensions.contains(VK_KHR_PRESENT_WAIT_EXTENSION_NAME)) {
 
-                    val presentIdSupport = VkPhysicalDevicePresentIdFeaturesKHR.calloc(stack)
-                    presentIdSupport.`sType$Default`()
-                    presentIdSupport.pNext(presentWaitSupport.address())
+                        val presentWaitSupport = VkPhysicalDevicePresentWaitFeaturesKHR.calloc(stack)
+                        presentWaitSupport.`sType$Default`()
 
-                    val supportedFeatures2 = VkPhysicalDeviceFeatures2.calloc(stack)
-                    supportedFeatures2.`sType$Default`()
-                    supportedFeatures2.pNext(presentIdSupport.address())
+                        val presentIdSupport = VkPhysicalDevicePresentIdFeaturesKHR.calloc(stack)
+                        presentIdSupport.`sType$Default`()
+                        presentIdSupport.pNext(presentWaitSupport.address())
 
-                    vkGetPhysicalDeviceFeatures2KHR(
-                        vkPhysicalDevice,
-                        supportedFeatures2
-                    )
+                        val supportedFeatures2 = VkPhysicalDeviceFeatures2.calloc(stack)
+                        supportedFeatures2.`sType$Default`()
+                        supportedFeatures2.pNext(presentIdSupport.address())
 
-                    if (presentWaitSupport.presentWait() && presentIdSupport.presentId()) {
-                        ciDevice.pNext(presentIdSupport)
-                        ciDevice.pNext(presentWaitSupport)
-                        canAwaitPresent = true
+                        vkGetPhysicalDeviceFeatures2KHR(physicalDevice, supportedFeatures2)
+
+                        if (presentWaitSupport.presentWait() && presentIdSupport.presentId()) {
+                            ciDevice.pNext(presentIdSupport)
+                            ciDevice.pNext(presentWaitSupport)
+                            canAwaitPresent = true
+                        }
                     }
                 }
-                DEFAULT_VK_DEVICE_CREATOR.vkCreateDevice(stack, vkPhysicalDevice, deviceExtensions, ciDevice)
-            }
         .build()
 
         this.canAwaitPresent = canAwaitPresent

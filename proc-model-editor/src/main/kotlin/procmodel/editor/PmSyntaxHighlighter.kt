@@ -54,7 +54,11 @@ abstract class PmSyntaxHighlighter(
     private fun insert(color: Color, start: Token, stop: Token) {
         if (start.line == stop.line) {
             insert(color, start.line, start.charPositionInLine, 1 + stop.stopIndex - start.startIndex)
-        } else println("Skipped multiline color mutation")
+        } else {
+            insert(color, start.line, start.charPositionInLine, Int.MAX_VALUE)
+            for (line in start.line + 1 until stop.line) insert(color, line, 0, Int.MAX_VALUE)
+            insert(color, stop.line, 0, stop.charPositionInLine + stop.text.length)
+        }
     }
 
     private fun getColor(lineNumber: Int, charIndex: Int): Color {

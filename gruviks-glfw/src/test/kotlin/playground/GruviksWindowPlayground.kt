@@ -14,6 +14,9 @@ import graviks2d.util.Color
 import gruviks.component.HorizontalComponentAlignment
 import gruviks.component.VerticalComponentAlignment
 import gruviks.component.menu.SimpleFlatMenu
+import gruviks.component.slider.CircleSliderStyle
+import gruviks.component.slider.FloatSlider
+import gruviks.component.slider.IntSlider
 import gruviks.component.test.DiscoComponent
 import gruviks.component.text.TextButton
 import gruviks.component.text.TextButtonStyle
@@ -145,7 +148,13 @@ fun createNewItemSetMenu(): SimpleFlatMenu {
     )
     menu.addComponent(TextArea(
             "test1234\ntest", textAreaStyle, "Just put some text here\n\rCan be whatever you want!"
-    ), RectRegion.percentage(1, 11, 99, 99))
+    ), RectRegion.percentage(1, 11, 99, 79))
+    menu.addComponent(IntSlider(3, 1, 10, CircleSliderStyle(
+        Color.GREEN, Color.RED, edgeMargin = 0.2f
+    )) { println("changed to $it") }, RectRegion.percentage(10, 85, 30, 90))
+    menu.addComponent(FloatSlider(0.4f, -1.2f, 5.6f, CircleSliderStyle(
+        Color.GREEN, Color.RED, edgeMargin = 0.2f
+    )) { println("changed to $it") }, RectRegion.percentage(40, 85, 90, 90))
     return menu
 }
 

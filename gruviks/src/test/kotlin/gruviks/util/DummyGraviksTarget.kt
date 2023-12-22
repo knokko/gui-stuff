@@ -19,6 +19,7 @@ class DummyGraviksTarget(
     var drawRoundedRectCounter = 0
     var drawImageCounter = 0
     var drawStringCounter = 0
+    var fillOvalCounter = 0
 
     override fun setScissor(newScissor: GraviksScissor) = GraviksScissor(0f, 0f, 1f, 1f)
 
@@ -47,6 +48,10 @@ class DummyGraviksTarget(
         color: Color
     ) {
         drawRoundedRectCounter += 1
+    }
+
+    override fun fillOval(centerX: Float, centerY: Float, radiusX: Float, radiusY: Float, color: Color, edgeMargin: Float) {
+        fillOvalCounter += 1
     }
 
     override fun drawImage(xLeft: Float, yBottom: Float, xRight: Float, yTop: Float, image: ImageReference) {

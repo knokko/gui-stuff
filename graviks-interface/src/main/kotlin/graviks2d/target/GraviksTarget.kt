@@ -33,6 +33,10 @@ interface GraviksTarget {
         drawRoundedRect(x1, y1, x2, y2, radiusX, 0f, color)
     }
 
+    fun fillOval(
+        centerX: Float, centerY: Float, radiusX: Float, radiusY: Float, color: Color, edgeMargin: Float
+    )
+
     fun drawImage(xLeft: Float, yBottom: Float, xRight: Float, yTop: Float, image: ImageReference)
 
     fun getImageSize(image: ImageReference): Pair<Int, Int>

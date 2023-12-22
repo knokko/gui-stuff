@@ -391,6 +391,26 @@ class GraviksContext(
         }
     }
 
+    override fun fillOval(centerX: Float, centerY: Float, radiusX: Float, radiusY: Float, color: Color, edgeMargin: Float) {
+        val claimedSpace = this.claimSpace(numVertices = 6, numOperationValues = 7)
+        val mf = 1f + edgeMargin
+        this.pushRect(
+            centerX - radiusX * mf, centerY - radiusY * mf, centerX + radiusX * mf, centerY + radiusY * mf,
+            vertexIndex = claimedSpace.vertexIndex, operationIndex = claimedSpace.operationIndex
+        )
+
+        this.buffers.operationCpuBuffer.run {
+            val index = claimedSpace.operationIndex
+            this.put(index, OP_CODE_FILL_OVAL)
+            this.put(index + 1, color.rawValue)
+            this.put(index + 2, encodeFloat(centerX))
+            this.put(index + 3, encodeFloat(centerY))
+            this.put(index + 4, encodeFloat(radiusX))
+            this.put(index + 5, encodeFloat(radiusY))
+            this.put(index + 6, encodeFloat(edgeMargin))
+        }
+    }
+
     private fun drawImage(xLeft: Float, yBottom: Float, xRight: Float, yTop: Float, imageIndex: Int) {
         val claimedSpace = this.claimSpace(numVertices = 6, numOperationValues = 5)
 

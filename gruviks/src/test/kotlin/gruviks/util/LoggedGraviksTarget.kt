@@ -52,6 +52,10 @@ class LoggedGraviksTarget: GraviksTarget {
         throw UnsupportedOperationException()
     }
 
+    override fun fillOval(centerX: Float, centerY: Float, radiusX: Float, radiusY: Float, color: Color, edgeMargin: Float) {
+        throw UnsupportedOperationException()
+    }
+
     override fun drawImage(xLeft: Float, yBottom: Float, xRight: Float, yTop: Float, image: ImageReference) {
         throw UnsupportedOperationException()
     }

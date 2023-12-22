@@ -14,6 +14,8 @@ class ChildTarget(
     private val maxX: Float,
     private val maxY: Float
 ): GraviksTarget {
+    private fun transformWidth(x: Float) = x * (this.maxX - this.minX)
+    private fun transformHeight(y: Float) = y * (this.maxY - this.minY)
     private fun transformX(x: Float) = this.minX + x * (this.maxX - this.minX)
     private fun transformY(y: Float) = this.minY + y * (this.maxY - this.minY)
 
@@ -79,6 +81,12 @@ class ChildTarget(
         this.transform(x1, y1, x2, y2) { tx1, ty1, tx2, ty2 ->
             this.parent.drawRoundedRect(tx1, ty1, tx2, ty2, radiusX * dx,  lineWidth, color)
         }
+    }
+
+    override fun fillOval(centerX: Float, centerY: Float, radiusX: Float, radiusY: Float, color: Color, edgeMargin: Float) {
+        this.parent.fillOval(
+            transformX(centerX), transformY(centerY), transformWidth(radiusX), transformHeight(radiusY), color, edgeMargin
+        )
     }
 
     override fun drawImage(xLeft: Float, yBottom: Float, xRight: Float, yTop: Float, image: ImageReference) {

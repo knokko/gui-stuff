@@ -26,6 +26,7 @@ const int OP_CODE_DRAW_RECT_BOTTOM_LEFT = 8;
 const int OP_CODE_DRAW_RECT_BOTTOM_RIGHT = 9;
 const int OP_CODE_DRAW_RECT_TOP_RIGHT = 10;
 const int OP_CODE_DRAW_RECT_TOP_LEFT = 11;
+const int OP_CODE_FILL_OVAL = 12;
 
 float decodeColorComponent(int rawValue) {
     return float(rawValue & 255) / 255.0;

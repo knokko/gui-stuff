@@ -31,9 +31,12 @@ import org.opentest4j.AssertionFailedError
 import java.awt.image.BufferedImage
 import java.awt.image.BufferedImage.TYPE_INT_ARGB
 import java.io.File
+import java.lang.RuntimeException
 import java.nio.file.Files
 import javax.imageio.ImageIO
+import kotlin.math.PI
 import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TestContext {
@@ -305,6 +308,92 @@ class TestContext {
             assertColorEquals(backgroundColor, hostImage.getPixel(58, 21))
             assertColorEquals(backgroundColor, hostImage.getPixel(58, 38))
             assertColorEquals(rectColor, hostImage.getPixel(55, 30))
+        }
+
+        graviks.destroy()
+    }
+
+    @Test
+    fun testFillOvalAntiAliased() {
+        val backgroundColor = Color.GREEN
+        val circleColor = Color.WHITE
+        val graviks = GraviksContext(this.graviksInstance, 200, 100, initialBackgroundColor = backgroundColor)
+
+        withTestImage(graviks, true) { update, hostImage ->
+            graviks.fillOval(0.7f, 0.4f, 0.2f, 0.3f, circleColor, 0.05f)
+            update()
+
+            // Test horizontal line through circle center
+            assertColorEquals(backgroundColor, hostImage.getPixel(90, 40))
+            assertColorEquals(circleColor, hostImage.getPixel(110, 40))
+            assertColorEquals(circleColor, hostImage.getPixel(140, 40))
+            assertColorEquals(circleColor, hostImage.getPixel(170, 40))
+            assertColorEquals(backgroundColor, hostImage.getPixel(190, 40))
+
+            // Test vertical line through circle center
+            assertColorEquals(backgroundColor, hostImage.getPixel(140, 0))
+            assertColorEquals(circleColor, hostImage.getPixel(140, 20))
+            assertColorEquals(circleColor, hostImage.getPixel(140, 60))
+            assertColorEquals(backgroundColor, hostImage.getPixel(140, 80))
+
+            // The number of circle colors should be slightly lower than PI * radiusX * width * radiusY * height
+            val maxCircleColorCounter = (PI * 0.2f * 200 * 0.3f * 100).roundToInt()
+            var circleCounter = 0
+            var mixedCounter = 0
+            for (x in 0 until hostImage.width) {
+                for (y in 0 until hostImage.height) {
+                    val color = hostImage.getPixel(x, y)
+                    if (color == circleColor) circleCounter += 1
+                    else if (color != backgroundColor) mixedCounter += 1
+                }
+            }
+
+            assertTrue(circleCounter < maxCircleColorCounter)
+            assertTrue(circleCounter > 0.7 * maxCircleColorCounter)
+            assertTrue(mixedCounter > 50)
+            assertTrue(mixedCounter < 0.3 * maxCircleColorCounter)
+        }
+
+        graviks.destroy()
+    }
+
+    @Test
+    fun testFillOvalAliased() {
+        val backgroundColor = Color.GREEN
+        val circleColor = Color.WHITE
+        val graviks = GraviksContext(this.graviksInstance, 200, 100, initialBackgroundColor = backgroundColor)
+
+        withTestImage(graviks, true) { update, hostImage ->
+            graviks.fillOval(0.7f, 0.4f, 0.2f, 0.3f, circleColor, 0f)
+            update()
+
+            // Test horizontal line through circle center
+            assertColorEquals(backgroundColor, hostImage.getPixel(99, 40))
+            assertColorEquals(circleColor, hostImage.getPixel(101, 40))
+            assertColorEquals(circleColor, hostImage.getPixel(140, 40))
+            assertColorEquals(circleColor, hostImage.getPixel(179, 40))
+            assertColorEquals(backgroundColor, hostImage.getPixel(181, 40))
+
+            // Test vertical line through circle center
+            assertColorEquals(backgroundColor, hostImage.getPixel(140, 9))
+            assertColorEquals(circleColor, hostImage.getPixel(140, 11))
+            assertColorEquals(circleColor, hostImage.getPixel(140, 69))
+            assertColorEquals(backgroundColor, hostImage.getPixel(140, 71))
+
+            // The number of circle colors should be approximately PI * radiusX * width * radiusY * height
+            val expectedCircleColorCounter = (PI * 0.2f * 200 * 0.3f * 100).roundToInt()
+            var circleCounter = 0
+            for (x in 0 until hostImage.width) {
+                for (y in 0 until hostImage.height) {
+                    val color = hostImage.getPixel(x, y)
+                    if (color == circleColor) circleCounter += 1
+                    else if (color != backgroundColor) throw RuntimeException("Encountered unexpected color $color")
+                }
+            }
+
+            if (circleCounter < expectedCircleColorCounter - 50 || circleCounter > expectedCircleColorCounter + 50) {
+                assertEquals(expectedCircleColorCounter, circleCounter)
+            }
         }
 
         graviks.destroy()

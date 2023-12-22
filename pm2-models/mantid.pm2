@@ -6,10 +6,15 @@ static parameter Map scytheParameters;
 static parameter Map bellyParameters;
 static parameter Map legParameters;
 
+#[range=[10.0, 50.0]]
 dynamic parameter float legAngle;
+#[range=[-90.0, 90.0]]
 dynamic parameter float armAngle;
+#[range=[-50.0, -10.0]]
 dynamic parameter float kneeAngle;
+# [ range = [ 10.0 , 50.0 ] ]
 dynamic parameter float footAngle;
+# [ range = [ -1 , 2 ] ] dynamic parameter int test1234;
 
 matrix rightScytheMatrix = dynamic Matrix {
 	Matrix scytheMatrix;
@@ -75,12 +80,12 @@ child model leg(leftFrontLegMatrix, legParameters) {
 child model leg(rightBackLegMatrix, legParameters) {
 	Map params;
 	params["kneeAngle"] = kneeAngle;
-	params["footAngle"] = kneeAngle;
+	params["footAngle"] = footAngle;
 	outputValue(params);
 };
 child model leg(rightFrontLegMatrix, legParameters) {
 	Map params;
 	params["kneeAngle"] = kneeAngle;
-	params["footAngle"] = footAngle * 2.0;
+	params["footAngle"] = footAngle;
 	outputValue(params);
 };

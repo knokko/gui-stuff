@@ -3,7 +3,7 @@ import model ./minimal/triangle;
 
 static parameter color ownColor;
 
-dynamic parameter float passDistance;
+#[range=[0.0, 1.0]] dynamic parameter float passDistance;
 
 Map triangleParameters;
 triangleParameters["color"] = ownColor;

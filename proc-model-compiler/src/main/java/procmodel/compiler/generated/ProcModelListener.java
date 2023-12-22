@@ -148,6 +148,36 @@ public interface ProcModelListener extends ParseTreeListener {
 	 */
 	void exitChildModel(ProcModelParser.ChildModelContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link ProcModelParser#intRangeHint}.
+	 * @param ctx the parse tree
+	 */
+	void enterIntRangeHint(ProcModelParser.IntRangeHintContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ProcModelParser#intRangeHint}.
+	 * @param ctx the parse tree
+	 */
+	void exitIntRangeHint(ProcModelParser.IntRangeHintContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ProcModelParser#floatRangeHint}.
+	 * @param ctx the parse tree
+	 */
+	void enterFloatRangeHint(ProcModelParser.FloatRangeHintContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ProcModelParser#floatRangeHint}.
+	 * @param ctx the parse tree
+	 */
+	void exitFloatRangeHint(ProcModelParser.FloatRangeHintContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ProcModelParser#parameterHint}.
+	 * @param ctx the parse tree
+	 */
+	void enterParameterHint(ProcModelParser.ParameterHintContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ProcModelParser#parameterHint}.
+	 * @param ctx the parse tree
+	 */
+	void exitParameterHint(ProcModelParser.ParameterHintContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link ProcModelParser#parameterDeclaration}.
 	 * @param ctx the parse tree
 	 */

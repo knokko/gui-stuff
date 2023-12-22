@@ -95,6 +95,24 @@ public interface ProcModelVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitChildModel(ProcModelParser.ChildModelContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link ProcModelParser#intRangeHint}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIntRangeHint(ProcModelParser.IntRangeHintContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ProcModelParser#floatRangeHint}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFloatRangeHint(ProcModelParser.FloatRangeHintContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ProcModelParser#parameterHint}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitParameterHint(ProcModelParser.ParameterHintContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link ProcModelParser#parameterDeclaration}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

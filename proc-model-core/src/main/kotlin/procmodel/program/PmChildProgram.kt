@@ -1,11 +1,12 @@
 package procmodel.program
 
+import procmodel.lang.types.PmFatType
 import procmodel.lang.types.PmType
 
 class PmChildProgram(
     val instructionIndex: Int,
     val staticParameters: Map<String, PmType>,
-    val dynamicParameters: Map<String, PmType>
+    val dynamicParameters: Map<String, PmFatType>
 ) {
     override fun equals(other: Any?) = other is PmChildProgram && other.instructionIndex == this.instructionIndex &&
             other.staticParameters == this.staticParameters && other.dynamicParameters == this.dynamicParameters

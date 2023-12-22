@@ -40,7 +40,13 @@ dynamicDeclarationBlock : dynamicBlock;
 
 childModel: 'child' 'model' IDENTIFIER '(' expression ',' expression ')' childModelBlock? ';';
 
-parameterDeclaration : PARAMETER_TYPE 'parameter' IDENTIFIER IDENTIFIER ';';
+intRangeHint : '#' '[' 'range' '=' '[' INT_LITERAL ',' INT_LITERAL ']' ']';
+
+floatRangeHint : '#' '[' 'range' '=' '[' FLOAT_LITERAL ',' FLOAT_LITERAL ']' ']';
+
+parameterHint : intRangeHint | floatRangeHint;
+
+parameterDeclaration : parameterHint? PARAMETER_TYPE 'parameter' IDENTIFIER IDENTIFIER ';';
 
 dynamicDeclaration: PARAMETER_TYPE IDENTIFIER ('<' (IDENTIFIER IDENTIFIER ',')* IDENTIFIER IDENTIFIER '>')? dynamicDeclarationBlock;
 

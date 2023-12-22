@@ -16,9 +16,14 @@ import procmodel.lang.functions.PmBuiltinFunctions
 import procmodel.lang.instructions.PmInstruction
 import procmodel.lang.instructions.PmInstructionType
 import procmodel.lang.types.*
+import procmodel.lang.types.hints.PmFloatRangeHint
+import procmodel.lang.types.hints.PmIntRangeHint
+import procmodel.lang.types.hints.PmTypeHint
 import procmodel.program.*
 import java.io.File
 import java.io.PrintWriter
+import java.lang.Float.parseFloat
+import java.lang.Integer.parseInt
 
 class PmCompiler<VertexValue : PmValue>(
     private val importer: PmImporter<VertexValue>,
@@ -34,7 +39,7 @@ class PmCompiler<VertexValue : PmValue>(
     private var isInsideDynamicDeclaration = false
     private var isInsideChildParametersBlock = false
     private val staticParameters = mutableMapOf<String, PmType>()
-    private val dynamicParameters = mutableMapOf<String, PmType>()
+    private val dynamicParameters = mutableMapOf<String, PmFatType>()
     private val types = PmTypes()
     private val functions = PmFunctions()
     private val importedModelIDs = mutableMapOf<String, String>()
@@ -249,11 +254,25 @@ class PmCompiler<VertexValue : PmValue>(
         val name = ctx.IDENTIFIER(1).text
 
         if (ctx.PARAMETER_TYPE().text == "static") {
+            if (ctx.parameterHint() != null) throw PmCompileError("Static parameters can't have hints")
             if (staticParameters.containsKey(name)) throw PmCompileError("Duplicate static parameter $name")
             staticParameters[name] = type
         } else if (ctx.PARAMETER_TYPE().text == "dynamic") {
+            var hint: PmTypeHint? = null
+            if (ctx.parameterHint() != null) {
+                if (ctx.parameterHint().intRangeHint() != null) {
+                    if (type != PmBuiltinTypes.INT) throw PmCompileError("Only integers can have integer range hints")
+                    val literals = ctx.parameterHint().intRangeHint().INT_LITERAL()
+                    hint = PmIntRangeHint(parseInt(literals[0].text), parseInt(literals[1].text))
+                }
+                if (ctx.parameterHint().floatRangeHint() != null) {
+                    if (type != PmBuiltinTypes.FLOAT) throw PmCompileError("Only floats can have float range hints")
+                    val literals = ctx.parameterHint().floatRangeHint().FLOAT_LITERAL()
+                    hint = PmFloatRangeHint(parseFloat(literals[0].text), parseFloat(literals[1].text))
+                }
+            }
             if (dynamicParameters.containsKey(name)) throw PmCompileError("Duplicate dynamic parameter $name")
-            dynamicParameters[name] = type
+            dynamicParameters[name] = PmFatType(type, hint)
         } else {
             throw PmCompileError("Unknown parameter type " + ctx.PARAMETER_TYPE().text)
         }

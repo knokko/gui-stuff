@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import procmodel.lang.instructions.PmInstruction
 import procmodel.lang.types.PmBuiltinTypes
+import procmodel.lang.types.PmFatType
 import procmodel.lang.types.PmInt
 import procmodel.model.PmDynamicMatrix
 import procmodel.program.PmDynamicMatrixConstructor
@@ -38,7 +39,7 @@ class TestMatrixProcessor {
         )
         val dynamicMatrix = PmDynamicMatrix(
             PmDynamicMatrixConstructor(instructions),
-            null, mapOf(Pair("param", PmBuiltinTypes.INT)),
+            null, mapOf(Pair("param", PmFatType(PmBuiltinTypes.INT, null))),
             mapOf(Pair("trans", Pair(PmBuiltinTypes.INT, PmInt(25))))
         )
         val processor = PmMatrixProcessor(dynamicMatrix, mapOf(Pair("param", PmInt(10))))

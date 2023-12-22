@@ -13,6 +13,7 @@ class PmColorTheme(
     val builtinFunctionCall: Color,
     val builtinTypeName: Color,
     val customTypeName: Color,
+    val hint: Color,
     val floatLiteral: Color,
     val intLiteral: Color,
     val stringLiteral: Color,
@@ -29,6 +30,7 @@ class PmColorTheme(
             builtinFunctionCall = Color.rgbInt(0, 150, 250),
             builtinTypeName = Color.rgbInt(0, 200, 200),
             customTypeName = Color.rgbInt(150, 150, 250),
+            hint = Color.rgbInt(0, 150, 40),
             floatLiteral = Color.rgbInt(0, 250, 50),
             intLiteral = Color.rgbInt(50, 200, 100),
             stringLiteral = Color.rgbInt(0, 150, 50)

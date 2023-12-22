@@ -1,5 +1,6 @@
 package procmodel.model
 
+import procmodel.lang.types.PmFatType
 import procmodel.lang.types.PmType
 import procmodel.lang.types.PmValue
 import procmodel.program.PmDynamicMatrixConstructor
@@ -18,7 +19,7 @@ import procmodel.program.PmParameterPropagator
 class PmDynamicMatrix(
     val construction: PmDynamicMatrixConstructor,
     val propagator: PmParameterPropagator?,
-    val dynamicParameterTypes: Map<String, PmType>,
+    val dynamicParameterTypes: Map<String, PmFatType>,
     val transferredVariables: Map<String, Pair<PmType, PmValue>>
 ) {
     /**

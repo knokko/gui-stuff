@@ -79,7 +79,7 @@ class TestDynamicParameterProcessor {
             PmInstruction.exitProgram(4)
         )
 
-        val parameterTypes = mapOf(Pair("angle", PmBuiltinTypes.FLOAT))
+        val parameterTypes = mapOf(Pair("angle", PmFatType(PmBuiltinTypes.FLOAT, null)))
         val parameterValues = mapOf(Pair("angle", PmFloat(25f)))
         val processor = PmDynamicParameterProcessor(PmProgramBody(instructions), parameterValues, parameterTypes)
         processor.execute()

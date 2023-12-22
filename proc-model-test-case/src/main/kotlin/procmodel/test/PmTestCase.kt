@@ -4,6 +4,7 @@ import graviks2d.util.Color
 import org.joml.Matrix3x2f
 import procmodel.lang.instructions.PmInstruction
 import procmodel.lang.types.*
+import procmodel.lang.types.hints.PmFloatRangeHint
 import procmodel.program.*
 
 object PmTestCase {
@@ -228,10 +229,10 @@ object PmTestCase {
             Pair("offsetY", PmBuiltinTypes.FLOAT),
             Pair("color1", PmBuiltinTypes.COLOR),
             Pair("color2", PmBuiltinTypes.COLOR)
-        ), mapOf(Pair("distance", PmBuiltinTypes.FLOAT))))
+        ), mapOf(Pair("distance", PmFatType(PmBuiltinTypes.FLOAT, null)))))
     )
     private val staticParameterTypes = mapOf(Pair("ownColor", PmBuiltinTypes.COLOR))
-    private val dynamicParameterTypes = mapOf(Pair("passDistance", PmBuiltinTypes.FLOAT))
+    private val dynamicParameterTypes = mapOf(Pair("passDistance", PmFatType(PmBuiltinTypes.FLOAT, PmFloatRangeHint(0f, 1f))))
     val program = PmProgram(
         PmProgramBody(mainBody + nestedBody + triangleBody),
         dynamicMatrices,

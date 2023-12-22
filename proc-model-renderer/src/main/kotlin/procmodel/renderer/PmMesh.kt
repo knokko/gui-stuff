@@ -1,7 +1,7 @@
 package procmodel.renderer
 
 import com.github.knokko.boiler.buffer.VmaBuffer
-import procmodel.lang.types.PmType
+import procmodel.lang.types.PmFatType
 import procmodel.model.PmDynamicMatrix
 
 class PmMesh internal constructor(
@@ -9,5 +9,5 @@ class PmMesh internal constructor(
     internal val vertexOffset: Int,
     internal val numVertices: Int,
     internal val matrices: List<PmDynamicMatrix?>,
-    val dynamicParameterTypes: Map<String, PmType>
+    val dynamicParameterTypes: Map<String, PmFatType>
 )

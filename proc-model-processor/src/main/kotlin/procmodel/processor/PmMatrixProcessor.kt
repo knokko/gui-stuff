@@ -12,7 +12,11 @@ class PmMatrixProcessor(
     private val transferredVariables = matrix.transferredVariables
 
     override fun executeInstructions() {
-        initializeParameters(variables, "dynamic", dynamicParameterTypes, dynamicParameterValues)
+        initializeParameters(
+            variables, "dynamic",
+            dynamicParameterTypes.mapValues { it.value.type },
+            dynamicParameterValues
+        )
         for ((name, typedValue) in transferredVariables) {
             val (type, value) = typedValue
             variables.defineVariable(type, name, value)

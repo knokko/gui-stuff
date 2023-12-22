@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import procmodel.importer.PmImporter
 import procmodel.lang.types.*
+import procmodel.lang.types.hints.PmFloatRangeHint
+import procmodel.lang.types.hints.PmIntRangeHint
 import procmodel.processor.PmValueProcessor
 
 class SimpleCompilerTests {
@@ -139,5 +141,21 @@ class SimpleCompilerTests {
             }
             outputValue(subtractFloats(square(5.0), square(4.0)));
         """, PmFloat(9f))
+    }
+
+    @Test
+    fun testDynamicParameterHints() {
+        val sourceCode = """
+            dynamic parameter int noHints;
+            #[range=[4, 8]] dynamic parameter int hintInt;
+            #[range=[-4.5, 5.25]]
+            dynamic parameter float hintFloat;
+        """
+        val program = PmCompiler.compile(sourceCode, PmImporter.dummy(), emptyMap(), emptyList())
+        assertEquals(mapOf(
+            Pair("noHints", PmFatType(PmBuiltinTypes.INT, null)),
+            Pair("hintInt", PmFatType(PmBuiltinTypes.INT, PmIntRangeHint(4, 8))),
+            Pair("hintFloat", PmFatType(PmBuiltinTypes.FLOAT, PmFloatRangeHint(-4.5f, 5.25f)))
+        ), program.dynamicParameters)
     }
 }

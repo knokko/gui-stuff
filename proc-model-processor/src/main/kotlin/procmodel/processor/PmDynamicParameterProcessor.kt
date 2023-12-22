@@ -1,21 +1,21 @@
 package procmodel.processor
 
 import procmodel.exceptions.PmRuntimeError
-import procmodel.lang.instructions.PmInstruction
-import procmodel.lang.types.PmMap
-import procmodel.lang.types.PmString
-import procmodel.lang.types.PmType
-import procmodel.lang.types.PmValue
+import procmodel.lang.types.*
 import procmodel.program.PmProgramBody
 
 class PmDynamicParameterProcessor(
     body: PmProgramBody,
     private val dynamicParentParameterValues: Map<String, PmValue>,
-    private val dynamicParentParameterTypes: Map<String, PmType>
+    private val dynamicParentParameterTypes: Map<String, PmFatType>
 ): PmValueProcessor(body) {
 
     override fun executeInstructions() {
-        initializeParameters(variables, "dynamic", dynamicParentParameterTypes, dynamicParentParameterValues)
+        initializeParameters(
+            variables, "dynamic",
+            dynamicParentParameterTypes.mapValues { it.value.type },
+            dynamicParentParameterValues
+        )
         super.executeInstructions()
         variables.popScope()
     }

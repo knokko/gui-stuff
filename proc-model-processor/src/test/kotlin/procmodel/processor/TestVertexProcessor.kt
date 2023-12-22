@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import procmodel.lang.functions.PmBuiltinFunction
 import procmodel.lang.types.*
+import procmodel.lang.types.hints.PmFloatRangeHint
 import procmodel.program.*
 import procmodel.test.*
 
@@ -23,7 +24,9 @@ class TestVertexProcessor {
         })
 
         val model = processor.execute()
-        assertEquals(mapOf(Pair("passDistance", PmBuiltinTypes.FLOAT)), model.dynamicParameters)
+        assertEquals(mapOf(
+            Pair("passDistance", PmFatType(PmBuiltinTypes.FLOAT, PmFloatRangeHint(0f, 1f)))
+        ), model.dynamicParameters)
 
         val red = PmColor(1f, 0f, 0f)
         val green = PmColor(0f, 1f, 0f)
@@ -52,21 +55,25 @@ class TestVertexProcessor {
 
         val bigMatrix = model.matrices[1]!!
         assertEquals(0, bigMatrix.parentIndex)
-        assertEquals(mapOf(Pair("passDistance", PmBuiltinTypes.FLOAT)), bigMatrix.dynamicParameterTypes)
+        assertEquals(mapOf(
+            Pair("passDistance", PmFatType(PmBuiltinTypes.FLOAT, PmFloatRangeHint(0f, 1f)))
+        ), bigMatrix.dynamicParameterTypes)
         assertNull(bigMatrix.propagator)
         assertTrue(bigMatrix.transferredVariables.isEmpty())
         assertEquals(PmTestCase.dynamicMatrices[0].instructions, bigMatrix.construction.instructions)
 
         val smallMatrix = model.matrices[2]!!
         assertEquals(0, smallMatrix.parentIndex)
-        assertEquals(mapOf(Pair("passDistance", PmBuiltinTypes.FLOAT)), smallMatrix.dynamicParameterTypes)
+        assertEquals(mapOf(
+            Pair("passDistance", PmFatType(PmBuiltinTypes.FLOAT, PmFloatRangeHint(0f, 1f)))
+        ), smallMatrix.dynamicParameterTypes)
         assertNull(smallMatrix.propagator)
         assertTrue(smallMatrix.transferredVariables.isEmpty())
         assertEquals(PmTestCase.dynamicMatrices[1].instructions, smallMatrix.construction.instructions)
 
         val downMatrix = model.matrices[3]!!
         assertEquals(2, downMatrix.parentIndex)
-        assertEquals(mapOf(Pair("distance", PmBuiltinTypes.FLOAT)), downMatrix.dynamicParameterTypes)
+        assertEquals(mapOf(Pair("distance", PmFatType(PmBuiltinTypes.FLOAT, null))), downMatrix.dynamicParameterTypes)
         assertEquals(PmTestCase.childInvocations[1].instructions, downMatrix.propagator!!.instructions)
         assertEquals(mapOf(
             Pair("offsetX", Pair(PmBuiltinTypes.FLOAT, PmFloat(0.2f))),
@@ -76,7 +83,7 @@ class TestVertexProcessor {
 
         val upMatrix = model.matrices[4]!!
         assertEquals(2, upMatrix.parentIndex)
-        assertEquals(mapOf(Pair("distance", PmBuiltinTypes.FLOAT)), upMatrix.dynamicParameterTypes)
+        assertEquals(mapOf(Pair("distance", PmFatType(PmBuiltinTypes.FLOAT, null))), upMatrix.dynamicParameterTypes)
         assertEquals(PmTestCase.childInvocations[1].instructions, upMatrix.propagator!!.instructions)
         assertEquals(mapOf(
             Pair("offsetX", Pair(PmBuiltinTypes.FLOAT, PmFloat(0.2f))),
@@ -103,7 +110,7 @@ class TestVertexProcessor {
         val propagationProcessor = PmDynamicParameterProcessor(
             PmProgramBody(upMatrix.propagator!!.instructions),
             mapOf(Pair("passDistance", PmFloat(0.25f))),
-            mapOf(Pair("passDistance", PmBuiltinTypes.FLOAT))
+            mapOf(Pair("passDistance", PmFatType(PmBuiltinTypes.FLOAT, PmFloatRangeHint(0f, 1f))))
         )
         propagationProcessor.execute()
         val propResult = propagationProcessor.result as PmMap

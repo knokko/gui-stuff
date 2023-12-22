@@ -122,10 +122,15 @@ abstract class PmSyntaxHighlighter(
     }
 
     override fun exitParameterDeclaration(ctx: ProcModelParser.ParameterDeclarationContext?) {
-        insertChildKeyword(ctx!!.children, 0, "static", colorTheme.keyword)
-        insertChildKeyword(ctx.children, 0, "dynamic", colorTheme.keyword)
-        insertChildKeyword(ctx.children, 1, "parameter", colorTheme.keyword)
-        insertTypeName(ctx.children, 2)
+        var baseChildIndex = 0
+        if (ctx!!.parameterHint() != null) {
+            insert(colorTheme.hint, ctx.parameterHint().start, ctx.parameterHint().stop)
+            baseChildIndex += 1
+        }
+        insertChildKeyword(ctx.children, baseChildIndex, "static", colorTheme.keyword)
+        insertChildKeyword(ctx.children, baseChildIndex, "dynamic", colorTheme.keyword)
+        insertChildKeyword(ctx.children, baseChildIndex + 1, "parameter", colorTheme.keyword)
+        insertTypeName(ctx.children, baseChildIndex + 2)
     }
 
     override fun exitDynamicDeclaration(ctx: ProcModelParser.DynamicDeclarationContext?) {

@@ -2,7 +2,6 @@ package procmodel.processor
 
 import procmodel.exceptions.PmRuntimeError
 import procmodel.lang.functions.PmBuiltinFunction
-import procmodel.lang.functions.PmBuiltinFunctions
 import procmodel.lang.instructions.PmInstruction
 import procmodel.lang.instructions.PmInstructionType
 import procmodel.lang.types.*
@@ -11,7 +10,6 @@ import procmodel.model.PmModel
 import procmodel.program.PmProgram
 import procmodel.scope.PmVariableScope
 import kotlin.jvm.Throws
-import kotlin.reflect.KClass
 
 class PmVertexProcessor<VertexValue : PmValue, Vertex>(
     private val program: PmProgram,
@@ -164,7 +162,7 @@ class PmVertexProcessor<VertexValue : PmValue, Vertex>(
         val returnInstructionIndex: Int,
         val parentMatrix: PmMatrixIndex,
         val dynamicChildBlockIndex: Int,
-        val dynamicParameters: Map<String, PmType>,
+        val dynamicParameters: Map<String, PmFatType>,
         val variables: PmVariableScope,
         val vertices: MutableList<VertexValue>,
         val dynamicMatrices: MutableList<PmDynamicMatrix?>,

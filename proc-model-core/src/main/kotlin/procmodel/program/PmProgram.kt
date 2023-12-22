@@ -1,5 +1,6 @@
 package procmodel.program
 
+import procmodel.lang.types.PmFatType
 import procmodel.lang.types.PmType
 
 /**
@@ -31,6 +32,6 @@ class PmProgram(
      */
     val children: Map<String, PmChildProgram>,
     val staticParameters: Map<String, PmType>,
-    val dynamicParameters: Map<String, PmType>
+    val dynamicParameters: Map<String, PmFatType>
 ) {
 }

@@ -9,10 +9,7 @@ import org.lwjgl.vulkan.VK10.*
 import org.lwjgl.vulkan.VkWriteDescriptorSet
 import procmodel.exceptions.PmRuntimeError
 import procmodel.lang.functions.PmBuiltinFunction
-import procmodel.lang.types.PmMap
-import procmodel.lang.types.PmString
-import procmodel.lang.types.PmType
-import procmodel.lang.types.PmValue
+import procmodel.lang.types.*
 import procmodel.processor.PmDynamicParameterProcessor
 import procmodel.processor.PmMatrixProcessor
 import procmodel.program.PmProgramBody
@@ -64,7 +61,7 @@ class PmTransformationMatrices<Matrix> internal constructor(
             val mesh = meshTask.mesh
             val dynamicParameterValues = meshTask.dynamicParameters
 
-            val matrices = ArrayList<Triple<Matrix, Map<String, PmValue>, Map<String, PmType>>>(mesh.matrices.size)
+            val matrices = ArrayList<Triple<Matrix, Map<String, PmValue>, Map<String, PmFatType>>>(mesh.matrices.size)
             for (matrix in mesh.matrices) {
                 if (matrix != null) {
                     val (parentMatrix, dynamicParentParameterValues, dynamicParentParameterTypes) = matrices[matrix.parentIndex]

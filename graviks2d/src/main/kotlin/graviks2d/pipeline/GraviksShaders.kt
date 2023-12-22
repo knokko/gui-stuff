@@ -12,3 +12,4 @@ internal const val OP_CODE_DRAW_RECT_BOTTOM_RIGHT = 9
 internal const val OP_CODE_DRAW_RECT_TOP_RIGHT = 10
 internal const val OP_CODE_DRAW_RECT_TOP_LEFT = 11
 internal const val OP_CODE_FILL_OVAL = 12
+internal const val OP_CODE_DRAW_OVAL = 13

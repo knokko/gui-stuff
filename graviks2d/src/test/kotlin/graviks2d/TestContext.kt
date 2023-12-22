@@ -314,6 +314,91 @@ class TestContext {
     }
 
     @Test
+    fun testDrawOvalAliased() {
+        val backgroundColor = Color.BLUE
+        val circleColor = Color.BLACK
+        val graviks = GraviksContext(this.graviksInstance, 200, 100, initialBackgroundColor = backgroundColor)
+
+        withTestImage(graviks, true) { update, hostImage ->
+            graviks.drawOval(0.7f, 0.4f, 0.2f, 0.3f, circleColor, 0.1f, false)
+            update()
+
+            // Horizontal test
+            assertColorEquals(backgroundColor, hostImage.getPixel(90, 40))
+            assertColorEquals(circleColor, hostImage.getPixel(100, 40))
+            assertColorEquals(backgroundColor, hostImage.getPixel(110, 40))
+            assertColorEquals(backgroundColor, hostImage.getPixel(140, 40))
+            assertColorEquals(backgroundColor, hostImage.getPixel(170, 40))
+            assertColorEquals(circleColor, hostImage.getPixel(180, 40))
+            assertColorEquals(backgroundColor, hostImage.getPixel(190, 40))
+
+            // Vertical test
+            assertColorEquals(backgroundColor, hostImage.getPixel(140, 0))
+            assertColorEquals(circleColor, hostImage.getPixel(140, 10))
+            assertColorEquals(backgroundColor, hostImage.getPixel(140, 20))
+            assertColorEquals(backgroundColor, hostImage.getPixel(140, 30))
+            assertColorEquals(backgroundColor, hostImage.getPixel(140, 50))
+            assertColorEquals(backgroundColor, hostImage.getPixel(140, 60))
+            assertColorEquals(circleColor, hostImage.getPixel(140, 70))
+            assertColorEquals(backgroundColor, hostImage.getPixel(140, 80))
+
+            // No mixed pixels
+            for (x in 0 until hostImage.width) {
+                for (y in 0 until hostImage.height) {
+                    val color = hostImage.getPixel(x, y)
+                    assertTrue(color == backgroundColor || color == circleColor)
+                }
+            }
+        }
+
+        graviks.destroy()
+    }
+
+    @Test
+    fun testDrawOvalAntiAliased() {
+        val backgroundColor = Color.BLUE
+        val circleColor = Color.BLACK
+        val graviks = GraviksContext(this.graviksInstance, 200, 100, initialBackgroundColor = backgroundColor)
+
+        withTestImage(graviks, true) { update, hostImage ->
+            graviks.drawOval(0.7f, 0.4f, 0.2f, 0.3f, circleColor, 0.1f, true)
+            update()
+
+            // Horizontal test
+            assertColorEquals(backgroundColor, hostImage.getPixel(90, 40))
+            assertTrue(hostImage.getPixel(100, 40) != backgroundColor)
+            assertColorEquals(backgroundColor, hostImage.getPixel(110, 40))
+            assertColorEquals(backgroundColor, hostImage.getPixel(140, 40))
+            assertColorEquals(backgroundColor, hostImage.getPixel(170, 40))
+            assertTrue(hostImage.getPixel(180, 40) != backgroundColor)
+            assertColorEquals(backgroundColor, hostImage.getPixel(190, 40))
+
+            // Vertical test
+            assertColorEquals(backgroundColor, hostImage.getPixel(140, 0))
+            assertTrue(hostImage.getPixel(140, 10) != backgroundColor)
+            assertColorEquals(backgroundColor, hostImage.getPixel(140, 20))
+            assertColorEquals(backgroundColor, hostImage.getPixel(140, 30))
+            assertColorEquals(backgroundColor, hostImage.getPixel(140, 50))
+            assertColorEquals(backgroundColor, hostImage.getPixel(140, 60))
+            assertTrue(hostImage.getPixel(140, 70) != backgroundColor)
+            assertColorEquals(backgroundColor, hostImage.getPixel(140, 80))
+
+            // We should have several mixed pixels
+            var mixedCounter = 0
+            for (x in 0 until hostImage.width) {
+                for (y in 0 until hostImage.height) {
+                    val color = hostImage.getPixel(x, y)
+                    if (color != backgroundColor && color != circleColor) mixedCounter += 1
+                }
+            }
+
+            assertTrue(mixedCounter > 100)
+        }
+
+        graviks.destroy()
+    }
+
+    @Test
     fun testFillOvalAntiAliased() {
         val backgroundColor = Color.GREEN
         val circleColor = Color.WHITE

@@ -78,6 +78,20 @@ class TestChildTarget {
     }
 
     @Test
+    fun testDrawOval() {
+        val parent = LoggedTarget()
+        val child = ChildTarget(parent, 0.2f, 0.5f, 0.6f, 0.8f)
+        val margin = 0.0001f
+        child.drawOval(0.1f, 0.5f, 0.1f, 0.2f, Color.RED, 0.2f, true)
+
+        assertEquals(0.2f, parent.x1, margin)
+        assertEquals(0.59f, parent.y1, margin)
+        assertEquals(0.28f, parent.x2, margin)
+        assertEquals(0.71f, parent.y2, margin)
+        assertEquals(0.04f, parent.radiusX, margin)
+    }
+
+    @Test
     fun testFillOval() {
         val parent = LoggedTarget()
         val child = ChildTarget(parent, 0.2f, 0.5f, 0.6f, 0.8f)
@@ -219,6 +233,22 @@ private class LoggedTarget(val width: Int = 1500, val height: Int = 1000) : Grav
         this.y1 = y1
         this.x2 = x2
         this.y2 = y2
+        this.radiusX = radiusX
+    }
+
+    override fun drawOval(
+        centerX: Float,
+        centerY: Float,
+        radiusX: Float,
+        radiusY: Float,
+        color: Color,
+        edgeMargin: Float,
+        antiAlias: Boolean
+    ) {
+        this.x1 = centerX - radiusX
+        this.y1 = centerY - radiusY
+        this.x2 = centerX + radiusX
+        this.y2 = centerY + radiusY
         this.radiusX = radiusX
     }
 

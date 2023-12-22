@@ -83,6 +83,22 @@ class ChildTarget(
         }
     }
 
+    override fun drawOval(
+        centerX: Float,
+        centerY: Float,
+        radiusX: Float,
+        radiusY: Float,
+        color: Color,
+        edgeMargin: Float,
+        antiAlias: Boolean
+    ) {
+        this.parent.drawOval(
+            transformX(centerX), transformY(centerY),
+            transformWidth(radiusX), transformHeight(radiusY),
+            color, edgeMargin, antiAlias
+        )
+    }
+
     override fun fillOval(centerX: Float, centerY: Float, radiusX: Float, radiusY: Float, color: Color, edgeMargin: Float) {
         this.parent.fillOval(
             transformX(centerX), transformY(centerY), transformWidth(radiusX), transformHeight(radiusY), color, edgeMargin

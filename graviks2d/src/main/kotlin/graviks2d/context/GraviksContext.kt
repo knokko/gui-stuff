@@ -24,6 +24,7 @@ import org.lwjgl.vulkan.VK10.VK_PHYSICAL_DEVICE_TYPE_CPU
 import org.lwjgl.vulkan.VK10.vkGetPhysicalDeviceProperties
 import org.lwjgl.vulkan.VkPhysicalDeviceProperties
 import kotlin.IllegalStateException
+import kotlin.math.abs
 import kotlin.math.min
 import kotlin.math.max
 import kotlin.math.roundToInt
@@ -391,9 +392,12 @@ class GraviksContext(
         }
     }
 
-    override fun fillOval(centerX: Float, centerY: Float, radiusX: Float, radiusY: Float, color: Color, edgeMargin: Float) {
+    private fun drawOrFillOval(
+        centerX: Float, centerY: Float, radiusX: Float, radiusY: Float,
+        color: Color, edgeMargin: Float, opCode: Int
+    ) {
         val claimedSpace = this.claimSpace(numVertices = 6, numOperationValues = 7)
-        val mf = 1f + edgeMargin
+        val mf = 1f + abs(edgeMargin)
         this.pushRect(
             centerX - radiusX * mf, centerY - radiusY * mf, centerX + radiusX * mf, centerY + radiusY * mf,
             vertexIndex = claimedSpace.vertexIndex, operationIndex = claimedSpace.operationIndex
@@ -401,7 +405,7 @@ class GraviksContext(
 
         this.buffers.operationCpuBuffer.run {
             val index = claimedSpace.operationIndex
-            this.put(index, OP_CODE_FILL_OVAL)
+            this.put(index, opCode)
             this.put(index + 1, color.rawValue)
             this.put(index + 2, encodeFloat(centerX))
             this.put(index + 3, encodeFloat(centerY))
@@ -409,6 +413,23 @@ class GraviksContext(
             this.put(index + 5, encodeFloat(radiusY))
             this.put(index + 6, encodeFloat(edgeMargin))
         }
+    }
+
+    override fun drawOval(
+        centerX: Float,
+        centerY: Float,
+        radiusX: Float,
+        radiusY: Float,
+        color: Color,
+        edgeMargin: Float,
+        antiAlias: Boolean
+    ) {
+        val finalEdgeMargin = if (antiAlias) edgeMargin else -edgeMargin
+        drawOrFillOval(centerX, centerY, radiusX, radiusY, color, finalEdgeMargin, OP_CODE_DRAW_OVAL)
+    }
+
+    override fun fillOval(centerX: Float, centerY: Float, radiusX: Float, radiusY: Float, color: Color, edgeMargin: Float) {
+        drawOrFillOval(centerX, centerY, radiusX, radiusY, color, edgeMargin, OP_CODE_FILL_OVAL)
     }
 
     private fun drawImage(xLeft: Float, yBottom: Float, xRight: Float, yTop: Float, imageIndex: Int) {

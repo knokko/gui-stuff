@@ -33,6 +33,12 @@ interface GraviksTarget {
         drawRoundedRect(x1, y1, x2, y2, radiusX, 0f, color)
     }
 
+    fun drawOval(
+        centerX: Float, centerY: Float,
+        radiusX: Float, radiusY: Float,
+        color: Color, edgeMargin: Float, antiAlias: Boolean
+    )
+
     fun fillOval(
         centerX: Float, centerY: Float, radiusX: Float, radiusY: Float, color: Color, edgeMargin: Float
     )

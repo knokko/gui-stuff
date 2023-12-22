@@ -42,6 +42,7 @@ const int OP_CODE_DRAW_TEXT = 6;
 const int OP_CODE_DRAW_ROUNDED_RECT = 7;
 const int OP_CODE_DRAW_RECT = 8;
 const int OP_CODE_FILL_OVAL = 12;
+const int OP_CODE_DRAW_OVAL = 13;
 
 float srgbToLinear(float srgbScalar) {
     // This formula came from https://en.wikipedia.org/wiki/SRGB#From_sRGB_to_CIE_XYZ
@@ -149,7 +150,7 @@ void handleDrawRect() {
     outColor = srgbToLinear(color * min(1.0, intensity));
 }
 
-void handleFillOval() {
+void handleFillOval(int operationCode) {
     vec4 color = decodeColor(shaderStorage.operations[operationIndex + 1]);
     float centerX = decodeFloat(shaderStorage.operations[operationIndex + 2]);
     float centerY = decodeFloat(shaderStorage.operations[operationIndex + 3]);
@@ -163,9 +164,25 @@ void handleFillOval() {
     float dy = (y - centerY) / radiusY;
     float d = dx * dx + dy * dy;
 
-    float intensity = (1.0 + margin - d) / (2.0 * margin);
-    if (d < 1.0 - margin) intensity = 1.0;
-    if (d > 1.0 + margin) intensity = 0.0;
+    float intensity;
+    if (operationCode == OP_CODE_FILL_OVAL) {
+        intensity = (1.0 + margin - d) / (2.0 * margin);
+    } else {
+        if (margin < 0.0) {
+            if (abs(1.0 - d) <= -margin) intensity = 1.0;
+            else intensity = 0.0;
+        } else {
+            intensity = 1.0 - abs(1.0 - d) / margin;
+        }
+    }
+
+    if (margin > 0.0) {
+        if (d < 1.0 - margin) {
+            if (operationCode == OP_CODE_FILL_OVAL) intensity = 1.0;
+            else intensity = 0.0;
+        }
+        if (d > 1.0 + margin) intensity = 0.0;
+    }
 
     outColor = srgbToLinear(intensity * color);
 }
@@ -195,8 +212,8 @@ void main() {
         handleDrawRoundedRect();
     } else if (operationCode == OP_CODE_DRAW_RECT) {
         handleDrawRect();
-    } else if (operationCode == OP_CODE_FILL_OVAL) {
-        handleFillOval();
+    } else if (operationCode == OP_CODE_FILL_OVAL || operationCode == OP_CODE_DRAW_OVAL) {
+        handleFillOval(operationCode);
     } else {
         // This is the 'unknown operation code' color, for the sake of debugging
         outColor = srgbToLinear(vec4(1.0, 0.2, 0.6, 1.0));

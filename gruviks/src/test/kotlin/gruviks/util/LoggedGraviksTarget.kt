@@ -52,6 +52,18 @@ class LoggedGraviksTarget: GraviksTarget {
         throw UnsupportedOperationException()
     }
 
+    override fun drawOval(
+        centerX: Float,
+        centerY: Float,
+        radiusX: Float,
+        radiusY: Float,
+        color: Color,
+        edgeMargin: Float,
+        antiAlias: Boolean
+    ) {
+        throw UnsupportedOperationException()
+    }
+
     override fun fillOval(centerX: Float, centerY: Float, radiusX: Float, radiusY: Float, color: Color, edgeMargin: Float) {
         throw UnsupportedOperationException()
     }

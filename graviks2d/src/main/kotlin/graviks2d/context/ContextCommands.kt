@@ -34,7 +34,7 @@ internal class ContextCommands(
             "GraviksContextCommandPool"
         )
         this.commandBuffer = boiler.commands.createPrimaryBuffers(this.commandPool, 1, "GraviksContextCommandBuffer")[0]
-        this.fence = boiler.sync.createFences(false, 1, "GraviksContextCommandFence")[0]
+        this.fence = boiler.sync.fenceBank.borrowFence()
         this.initImageLayouts()
     }
 
@@ -80,9 +80,7 @@ internal class ContextCommands(
 
         if (!hasPendingSubmission) throw IllegalStateException("There is no pending submission to await")
 
-        // If this simple command can't complete within this timeout, something is wrong
-        val timeout = 10_000_000_000L
-        context.instance.boiler.sync.waitAndReset(stack, fence, timeout)
+        context.instance.boiler.sync.waitAndReset(stack, fence)
 
         hasPendingSubmission = false
     }
@@ -279,6 +277,6 @@ internal class ContextCommands(
         if (hasPendingSubmission) stackPush().use { stack -> awaitPendingSubmission(stack) }
 
         vkDestroyCommandPool(context.instance.boiler.vkDevice(), this.commandPool, null)
-        vkDestroyFence(context.instance.boiler.vkDevice(), this.fence, null)
+        context.instance.boiler.sync.fenceBank.returnFence(fence, true)
     }
 }

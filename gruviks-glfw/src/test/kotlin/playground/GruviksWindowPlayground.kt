@@ -1,7 +1,6 @@
 package playground
 
 import com.github.knokko.boiler.builder.BoilerBuilder
-import com.github.knokko.boiler.builder.instance.ValidationFeatures
 import com.github.knokko.memory.MemorySnapshot
 import com.github.knokko.profiler.SampleProfiler
 import com.github.knokko.profiler.storage.SampleStorage
@@ -171,7 +170,7 @@ fun main() {
     val graviksWindow = GraviksWindow(
         1000, 800,
         BoilerBuilder(VK_API_VERSION_1_2, "GruviksWindowPlayground", 1)
-            .validation(ValidationFeatures(true, true,false, true, true))
+            .validation()
     ) { instance, width, height ->
         GraviksContext(instance, width, height)
     }

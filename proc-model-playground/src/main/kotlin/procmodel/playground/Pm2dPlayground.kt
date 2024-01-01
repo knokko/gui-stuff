@@ -2,7 +2,6 @@ package procmodel.playground
 
 import com.github.knokko.boiler.builder.BoilerBuilder
 import com.github.knokko.boiler.builder.BoilerSwapchainBuilder
-import com.github.knokko.boiler.builder.instance.ValidationFeatures
 import com.github.knokko.boiler.commands.CommandRecorder
 import com.github.knokko.boiler.exceptions.VulkanFailureException.assertVkSuccess
 import com.github.knokko.boiler.pipelines.GraphicsPipelineBuilder
@@ -32,7 +31,8 @@ fun main() {
     val boiler = BoilerBuilder(
         VK_API_VERSION_1_2, "Pm2dPlayground", VK_MAKE_VERSION(0, 1, 0)
     )
-        .validation(ValidationFeatures(true, true, false, true, true))
+        .validation()
+        .printDeviceRejectionInfo()
         .requiredDeviceExtensions(setOf(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME))
         .extraDeviceRequirements { physicalDevice, _, stack ->
             val dynamicRendering = VkPhysicalDeviceDynamicRenderingFeaturesKHR.calloc(stack)
@@ -46,7 +46,7 @@ fun main() {
 
             dynamicRendering.dynamicRendering()
         }
-        .beforeDeviceCreation { ciDevice, _, stack ->
+        .beforeDeviceCreation { ciDevice, _, _, stack ->
             val dynamicRendering = VkPhysicalDeviceDynamicRenderingFeaturesKHR.calloc(stack)
             dynamicRendering.`sType$Default`()
             dynamicRendering.dynamicRendering(true)
@@ -174,7 +174,7 @@ fun main() {
             )
         }
 
-        boiler.swapchains.presentImage(swapchainImage)
+        boiler.swapchains.presentImage(swapchainImage, commandFence)
     }
 
     vkDeviceWaitIdle(boiler.vkDevice())

@@ -73,7 +73,7 @@ fun main() {
     val graviksWindow = GraviksWindow(
         1200, 900,
         BoilerBuilder(VK_API_VERSION_1_0, "SwitchControllerPlayground", 1)
-            .validation(ValidationFeatures(false, false, false, true, true))
+            .validation()
     ) { instance, width, height -> GraviksContext(instance, width, height) }
 
     createAndControlGruviksWindow(graviksWindow, createRootMenu())

@@ -1,7 +1,6 @@
 package procmodel.editor2d
 
 import com.github.knokko.boiler.builder.BoilerBuilder
-import com.github.knokko.boiler.builder.instance.ValidationFeatures
 import com.github.knokko.boiler.instance.BoilerInstance
 import com.github.knokko.profiler.SampleProfiler
 import com.github.knokko.profiler.storage.SampleStorage
@@ -67,7 +66,7 @@ fun main() {
     profiler.start()
 
     val builder = BoilerBuilder(VK_API_VERSION_1_2, "Pm2Editor", 1)
-        .validation(ValidationFeatures(false, false, false, true, true))
+        .validation()
         .requiredDeviceExtensions(setOf(VK_KHR_DYNAMIC_RENDERING_EXTENSION_NAME))
         .extraDeviceRequirements { physicalDevice, _, stack ->
             val dynamicRendering = VkPhysicalDeviceDynamicRenderingFeaturesKHR.calloc(stack)
@@ -81,7 +80,7 @@ fun main() {
 
             dynamicRendering.dynamicRendering()
         }
-        .beforeDeviceCreation { ciDevice, _, stack ->
+        .beforeDeviceCreation { ciDevice, _, _, stack ->
             val dynamicRendering = VkPhysicalDeviceDynamicRenderingFeaturesKHR.calloc(stack)
             dynamicRendering.`sType$Default`()
             dynamicRendering.dynamicRendering(true)

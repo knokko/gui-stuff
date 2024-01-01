@@ -1,7 +1,6 @@
 package graviks2d
 
 import com.github.knokko.boiler.builder.BoilerBuilder
-import com.github.knokko.boiler.builder.instance.ValidationFeatures
 import com.github.knokko.boiler.commands.CommandRecorder
 import com.github.knokko.boiler.exceptions.VulkanFailureException.assertVkSuccess
 import com.github.knokko.boiler.images.VmaImage
@@ -44,7 +43,8 @@ class TestContext {
     private val boiler = BoilerBuilder(
         VK_API_VERSION_1_0, "TestGraviksContext", VK_MAKE_VERSION(0, 5, 0)
     )
-        .validation(ValidationFeatures(false, false, false, true, true))
+        .validation()
+        .forbidValidationErrors()
         .build()
     private val graviksInstance = GraviksInstance(boiler)
 

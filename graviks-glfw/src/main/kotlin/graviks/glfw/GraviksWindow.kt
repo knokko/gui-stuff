@@ -51,7 +51,7 @@ class GraviksWindow(
                 VK_KHR_PRESENT_WAIT_EXTENSION_NAME,
                 VK_KHR_PRESENT_ID_EXTENSION_NAME
             ))
-                .beforeDeviceCreation { ciDevice, physicalDevice, stack ->
+                .beforeDeviceCreation { ciDevice, _, physicalDevice, stack ->
                     val deviceExtensions = CollectionHelper.decodeStringSet(ciDevice.ppEnabledExtensionNames())
                     if (deviceExtensions.contains(VK_KHR_PRESENT_WAIT_EXTENSION_NAME)) {
 
@@ -124,7 +124,7 @@ class GraviksWindow(
                 imageDstUsage = null, shouldAwaitCompletion = false
             )
 
-            val incrementalPresentAddress = if (hasIncrementalPresent && fillPresentRegions != null) {
+            val incrementalPresent = if (hasIncrementalPresent && fillPresentRegions != null) {
                 val presentRectangles = fillPresentRegions(stack)
 
                 val presentRegions = VkPresentRegionKHR.calloc(1, stack)
@@ -136,30 +136,29 @@ class GraviksWindow(
                 incrementalPresent.swapchainCount(1)
                 incrementalPresent.pRegions(presentRegions)
 
-                incrementalPresent.address()
-            } else 0L
+                incrementalPresent
+            } else null
 
             val pPresentId = stack.longs(lastPresentId + 1L)
 
-            val presentIdAddress = if (canAwaitPresent) {
+            val presentId = if (canAwaitPresent) {
                 val presentIdInfo = VkPresentIdKHR.calloc(stack)
                 presentIdInfo.`sType$Default`()
-                presentIdInfo.pNext(incrementalPresentAddress)
                 presentIdInfo.swapchainCount(1)
                 presentIdInfo.pPresentIds(pPresentId)
 
-                presentIdInfo.address()
-            } else 0L
+                presentIdInfo
+            } else null
 
-            boiler.swapchains.presentImage(swapchainImage) { presentInfo ->
-                if (waitUntilVisible) presentInfo.pNext(presentIdAddress)
-                else presentInfo.pNext(incrementalPresentAddress)
+            boiler.swapchains.presentImage(swapchainImage, { true }) { presentInfo ->
+                if (waitUntilVisible && presentId != null) presentInfo.pNext(presentId)
+                if (incrementalPresent != null) presentInfo.pNext(incrementalPresent)
             }
 
             if (waitUntilVisible) {
                 val startTime = nanoTime()
                 assertVkSuccess(vkWaitForPresentKHR(
-                    boiler.vkDevice(), swapchainImage.vkSwapchain, pPresentId[0], 1_000_000_000L
+                    boiler.vkDevice(), swapchainImage.vkSwapchain, pPresentId[0], boiler.defaultTimeout
                 ), "WaitForPresentKHR", "GraviksWindow")
                 println("presentation took ${(nanoTime() - startTime) / 1000} microseconds")
                 lastPresentId += 1

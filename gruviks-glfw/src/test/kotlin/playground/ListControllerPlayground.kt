@@ -1,7 +1,6 @@
 package playground
 
 import com.github.knokko.boiler.builder.BoilerBuilder
-import com.github.knokko.boiler.builder.instance.ValidationFeatures
 import graviks.glfw.GraviksWindow
 import graviks2d.context.GraviksContext
 import graviks2d.resource.text.TextStyle
@@ -131,7 +130,7 @@ fun main() {
     val graviksWindow = GraviksWindow(
             1200, 900,
         BoilerBuilder(VK_API_VERSION_1_0, "ListControllerPlayground", 1)
-            .validation(ValidationFeatures(false, false, false, true, true))
+            .validation()
     ) { instance, width, height -> GraviksContext(instance, width, height) }
 
     createAndControlGruviksWindow(graviksWindow, createMenu())

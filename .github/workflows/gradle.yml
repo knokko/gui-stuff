@@ -1,4 +1,4 @@
-name: Testing with Java 20 on Linux
+name: Testing with Java 21 on Linux
 
 on:
   push:
@@ -16,10 +16,10 @@ jobs:
       - uses: actions/checkout@v3
       - run: sudo apt install vulkan-validationlayers
       - run: sudo apt install mesa-vulkan-drivers
-      - name: Set up JDK 20
+      - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
-          java-version: 20
+          java-version: 21
           distribution: 'temurin'
       - name: Build with Gradle
         uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0

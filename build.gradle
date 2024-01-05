@@ -2,7 +2,7 @@ import org.gradle.internal.os.OperatingSystem
 
 plugins {
     id 'java'
-    id 'org.jetbrains.kotlin.jvm' version '1.9.0'
+    id 'org.jetbrains.kotlin.jvm' version '1.9.22'
     id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
@@ -18,16 +18,16 @@ allprojects {
     }
 
     compileKotlin {
-        kotlinOptions.jvmTarget = "20"
+        kotlinOptions.jvmTarget = "21"
     }
 
     compileTestKotlin {
-        kotlinOptions.jvmTarget = "20"
+        kotlinOptions.jvmTarget = "21"
     }
 
     java {
-        sourceCompatibility = "20"
-        targetCompatibility = "20"
+        sourceCompatibility = "21"
+        targetCompatibility = "21"
     }
 
     project.ext.jomlVersion = "1.10.1"
